@@ -1,0 +1,27 @@
+version: '3.7'
+
+services:
+  api:
+    image: airnote_dev
+    build:
+      context: ../../
+      dockerfile: ./deployments/development/api/Dockerfile
+    ports:
+      - '8080:8080'
+    volumes:
+      - ../../:/airnote
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: airnote
+      MYSQL_USER: airnote
+      MYSQL_PASSWORD: airnote
+      MYSQL_ROOT_PASSWORD: airnote
+    command: mysqld --character-set-server=utf8 --collation-server=utf8_unicode_ci
+    volumes:
+      - db-data:/var/lib/mysql
+    ports:
+      - '3306:3306'
+volumes:
+  db-data:
+    driver: local
