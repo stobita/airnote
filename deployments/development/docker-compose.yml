@@ -10,6 +10,14 @@ services:
       - '8080:8080'
     volumes:
       - ../../:/airnote
+    depends_on:
+      - db
+    environment:
+      DB_USER: airnote
+      DB_PASS: airnote
+      DB_HOST: db
+      DB_PORT: 3306
+      DB_NAME: airnote
   db:
     image: mysql:5.7
     environment:
