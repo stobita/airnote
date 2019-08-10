@@ -9,10 +9,14 @@ server:
   host: localhost
 schema:
 - name: airnote
-  path: ./cmd/airnote
+  path: .
   commands:
+    install:
+      status: true
+      method: go build -o airnote cmd/airnote/airnote.go
     run:
       status: true
+      method: ./airnote
   watcher:
     extensions:
     - go
