@@ -1,14 +1,46 @@
 package server
 
-import "github.com/gin-gonic/gin"
+import (
+	"net/http"
+
+	"github.com/gin-gonic/gin"
+	"github.com/stobita/airnote/internal/controller"
+	"github.com/stobita/airnote/internal/presenter"
+	"github.com/stobita/airnote/internal/repository"
+	"github.com/stobita/airnote/internal/usecase"
+)
 
 // Run api server
 func Run() error {
+	engine, err := getEngine()
+	if err != nil {
+		return err
+	}
+	return engine.Run()
+}
+
+func getEngine() (*gin.Engine, error) {
 	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "airnote",
-		})
+
+	db, err := repository.NewDBConn()
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer db.Close()
+
+	repo := repository.New(db)
+
+	controller := controller.New(func(w http.ResponseWriter) usecase.InputPort {
+		return usecase.NewInteractor(repo, presenter.New(w))
 	})
-	return r.Run()
+
+	v1 := r.Group("/api/v1")
+	{
+		v1.GET("/links", controller.GetLink())
+		v1.POST("/links", controller.PostLink())
+
+	}
+	return r, nil
 }

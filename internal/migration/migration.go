@@ -20,11 +20,11 @@ func Run() error {
 	}
 	db, err := sql.Open(driver, fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s",
-		os.Getenv("DB_USER"),
-		os.Getenv("DB_PASS"),
-		os.Getenv("DB_HOST"),
-		os.Getenv("DB_PORT"),
-		os.Getenv("DB_NAME"),
+		os.Getenv("MYSQL_USER"),
+		os.Getenv("MYSQL_PASS"),
+		os.Getenv("MYSQL_HOST"),
+		os.Getenv("MYSQL_PORT"),
+		os.Getenv("MYSQL_DBNAME"),
 	))
 	if err != nil {
 		return errors.Wrap(err, "Failed connection")
