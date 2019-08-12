@@ -438,16 +438,6 @@ func (o *Link) Insert(ctx context.Context, exec boil.ContextExecutor, columns bo
 	}
 
 	var err error
-	if !boil.TimestampsAreSkipped(ctx) {
-		currTime := time.Now().In(boil.GetLocation())
-
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
-		}
-		if queries.MustTime(o.UpdatedAt).IsZero() {
-			queries.SetScanner(&o.UpdatedAt, currTime)
-		}
-	}
 
 	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
 		return err
@@ -550,12 +540,6 @@ CacheNoHooks:
 // See boil.Columns.UpdateColumnSet documentation to understand column list inference for updates.
 // Update does not automatically update the record in case of default values. Use .Reload() to refresh the records.
 func (o *Link) Update(ctx context.Context, exec boil.ContextExecutor, columns boil.Columns) (int64, error) {
-	if !boil.TimestampsAreSkipped(ctx) {
-		currTime := time.Now().In(boil.GetLocation())
-
-		queries.SetScanner(&o.UpdatedAt, currTime)
-	}
-
 	var err error
 	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
 		return 0, err
@@ -571,9 +555,6 @@ func (o *Link) Update(ctx context.Context, exec boil.ContextExecutor, columns bo
 			linkPrimaryKeyColumns,
 		)
 
-		if !columns.IsWhitelist() {
-			wl = strmangle.SetComplement(wl, []string{"created_at"})
-		}
 		if len(wl) == 0 {
 			return 0, errors.New("rdb: unable to update links, could not build whitelist")
 		}
@@ -689,14 +670,6 @@ var mySQLLinkUniqueColumns = []string{
 func (o *Link) Upsert(ctx context.Context, exec boil.ContextExecutor, updateColumns, insertColumns boil.Columns) error {
 	if o == nil {
 		return errors.New("rdb: no links provided for upsert")
-	}
-	if !boil.TimestampsAreSkipped(ctx) {
-		currTime := time.Now().In(boil.GetLocation())
-
-		if queries.MustTime(o.CreatedAt).IsZero() {
-			queries.SetScanner(&o.CreatedAt, currTime)
-		}
-		queries.SetScanner(&o.UpdatedAt, currTime)
 	}
 
 	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
