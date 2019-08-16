@@ -1,8 +1,10 @@
 package server
 
 import (
+	"database/sql"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/stobita/airnote/internal/controller"
 	"github.com/stobita/airnote/internal/presenter"
@@ -12,29 +14,30 @@ import (
 
 // Run api server
 func Run() error {
-	engine, err := getEngine()
+	db, err := repository.NewDBConn()
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	engine, err := getEngine(db)
 	if err != nil {
 		return err
 	}
 	return engine.Run()
 }
 
-func getEngine() (*gin.Engine, error) {
+func getEngine(db *sql.DB) (*gin.Engine, error) {
 	r := gin.Default()
-
-	db, err := repository.NewDBConn()
-
-	if err != nil {
-		return nil, err
-	}
-
-	defer db.Close()
 
 	repo := repository.New(db)
 
 	controller := controller.New(func(w http.ResponseWriter) usecase.InputPort {
 		return usecase.NewInteractor(repo, presenter.New(w))
 	})
+
+	r.Use(cors.New(cors.Config{
+		AllowOrigins: []string{"http://localhost:3000"},
+	}))
 
 	v1 := r.Group("/api/v1")
 	{
