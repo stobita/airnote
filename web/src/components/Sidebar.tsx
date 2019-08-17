@@ -1,5 +1,6 @@
 import React from "react";
 import styled from "styled-components";
+import colors from "../colors";
 
 export const Sidebar = () => {
   return (
@@ -14,8 +15,9 @@ export const Sidebar = () => {
 
 const Wrapper = styled.div`
   display: flex;
-  background: black;
-  color: white;
+  background: ${colors.mainBlack};
+  color: ${colors.mainWhite};
   flex-direction: column;
   min-height: 100vh;
+  padding: 16px;
 `;

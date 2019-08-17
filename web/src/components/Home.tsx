@@ -3,6 +3,7 @@ import { repositoryFactory } from "../api/repositoryFactory";
 import { Link } from "../model/link";
 import { Sidebar } from "./Sidebar";
 import styled from "styled-components";
+import { LinkIndex } from "./LinkIndex";
 const linkRepository = repositoryFactory.get("links");
 
 export const Home = () => {
@@ -16,12 +17,7 @@ export const Home = () => {
         <Sidebar />
       </Left>
       <Right>
-        <ul>
-          {links.map(link => (
-            <li key={link.url}>{link.url}</li>
-          ))}
-          <li>test</li>
-        </ul>
+        <LinkIndex items={links} />
       </Right>
     </Wrapper>
   );
