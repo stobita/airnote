@@ -6,6 +6,7 @@ import (
 
 	"github.com/stobita/airnote/internal/domain/model"
 	"github.com/stobita/airnote/internal/repository/rdb"
+	"github.com/volatiletech/null"
 	"github.com/volatiletech/sqlboiler/boil"
 )
 
@@ -22,7 +23,8 @@ func New(db *sql.DB) *repository {
 
 func (r *repository) SaveLink(input *model.Link) error {
 	link := rdb.Link{
-		URL: input.GetURL(),
+		URL:         input.GetURL(),
+		Description: null.StringFrom(input.GetDescription()),
 	}
 	if err := link.Insert(context.Background(), r.db, boil.Whitelist("url")); err != nil {
 		return err
@@ -40,7 +42,8 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 	var result []*model.Link
 	for _, v := range links {
 		input := model.LinkInput{
-			URL: v.URL,
+			URL:         v.URL,
+			Description: v.Description.String,
 		}
 		m := model.NewLink(input)
 		m.SetID(v.ID)

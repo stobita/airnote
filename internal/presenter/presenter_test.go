@@ -16,7 +16,9 @@ func TestPresenter_ResponseLinks(t *testing.T) {
 		p := presenter.New(w)
 		o := usecase.LinksOutputData{
 			&usecase.LinkOutputData{
-				URL: "test",
+				ID:          1,
+				URL:         "test",
+				Description: "test",
 			},
 		}
 		if err := p.ResponseLinks(o); err != nil {
@@ -28,7 +30,9 @@ func TestPresenter_ResponseLinks(t *testing.T) {
 			{
 				"items": [
 					{
-						"url": "test"
+						"id": 1,
+						"url": "test",
+						"description": "test"
 					}
 				]
 			}
@@ -47,7 +51,9 @@ func TestPresenter_ResponseLink(t *testing.T) {
 		w := httptest.NewRecorder()
 		p := presenter.New(w)
 		o := usecase.LinkOutputData{
-			URL: "test",
+			ID:          1,
+			URL:         "test",
+			Description: "test",
 		}
 		if err := p.ResponseLink(o); err != nil {
 			t.Fatalf("Failed response link list: %s", err)
@@ -56,7 +62,9 @@ func TestPresenter_ResponseLink(t *testing.T) {
 		body, _ := ioutil.ReadAll(result.Body)
 		expect := `
 			{
-				"url": "test"
+				"id": 1,
+				"url": "test",
+				"description": "test"
 			}
 		`
 

@@ -3,6 +3,7 @@
 CREATE TABLE links (
   id INT NOT NULL AUTO_INCREMENT,
   url text NOT NULL,
+  description text,
   created_at datetime default current_timestamp,
   updated_at datetime default current_timestamp on update current_timestamp,
   PRIMARY KEY (id)

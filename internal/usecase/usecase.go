@@ -17,7 +17,8 @@ type InputPort interface {
 
 // InputData is used by InputPort
 type InputData struct {
-	URL string
+	URL         string
+	Description string
 }
 
 type outputPort interface {
@@ -30,7 +31,9 @@ type LinksOutputData []*LinkOutputData
 
 // LinkOutputData is used by OutputPort
 type LinkOutputData struct {
-	URL string
+	ID          int
+	URL         string
+	Description string
 }
 
 type repository interface {
@@ -47,11 +50,18 @@ func NewInteractor(r repository, o outputPort) *interactor {
 }
 
 func (i *interactor) AddLink(input InputData) error {
-	model := model.NewLink(model.LinkInput{URL: input.URL})
+	model := model.NewLink(model.LinkInput{
+		URL:         input.URL,
+		Description: input.Description,
+	})
 	if err := i.repository.SaveLink(model); err != nil {
 		return err
 	}
-	o := LinkOutputData{URL: model.GetURL()}
+	o := LinkOutputData{
+		ID:          model.GetID(),
+		URL:         model.GetURL(),
+		Description: model.GetDescription(),
+	}
 	return i.outputPort.ResponseLink(o)
 }
 
@@ -63,7 +73,9 @@ func (i *interactor) GetAllLinks() error {
 	var o LinksOutputData
 	for _, v := range links {
 		o = append(o, &LinkOutputData{
-			URL: v.GetURL(),
+			ID:          v.GetID(),
+			URL:         v.GetURL(),
+			Description: v.GetDescription(),
 		})
 	}
 	return i.outputPort.ResponseLinks(o)
