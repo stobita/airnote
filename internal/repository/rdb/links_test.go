@@ -568,7 +568,7 @@ func testLinksSelect(t *testing.T) {
 }
 
 var (
-	linkDBTypes = map[string]string{`ID`: `int`, `URL`: `text`, `CreatedAt`: `datetime`, `UpdatedAt`: `datetime`}
+	linkDBTypes = map[string]string{`ID`: `int`, `URL`: `text`, `Description`: `text`, `CreatedAt`: `datetime`, `UpdatedAt`: `datetime`}
 	_           = bytes.MinRead
 )
 

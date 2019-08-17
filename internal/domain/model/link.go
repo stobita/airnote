@@ -1,17 +1,20 @@
 package model
 
 type Link struct {
-	id  int
-	url string
+	id          int
+	url         string
+	description string
 }
 
 type LinkInput struct {
-	URL string
+	URL         string
+	Description string
 }
 
 func NewLink(i LinkInput) *Link {
 	return &Link{
-		url: i.URL,
+		url:         i.URL,
+		description: i.Description,
 	}
 }
 
@@ -21,6 +24,10 @@ func (l *Link) GetID() int {
 
 func (l *Link) GetURL() string {
 	return l.url
+}
+
+func (l *Link) GetDescription() string {
+	return l.description
 }
 
 func (l *Link) SetID(id int) {

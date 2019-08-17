@@ -24,25 +24,28 @@ import (
 
 // Link is an object representing the database table.
 type Link struct {
-	ID        int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	URL       string    `boil:"url" json:"url" toml:"url" yaml:"url"`
-	CreatedAt null.Time `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
-	UpdatedAt null.Time `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
+	ID          int         `boil:"id" json:"id" toml:"id" yaml:"id"`
+	URL         string      `boil:"url" json:"url" toml:"url" yaml:"url"`
+	Description null.String `boil:"description" json:"description,omitempty" toml:"description" yaml:"description,omitempty"`
+	CreatedAt   null.Time   `boil:"created_at" json:"created_at,omitempty" toml:"created_at" yaml:"created_at,omitempty"`
+	UpdatedAt   null.Time   `boil:"updated_at" json:"updated_at,omitempty" toml:"updated_at" yaml:"updated_at,omitempty"`
 
 	R *linkR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L linkL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var LinkColumns = struct {
-	ID        string
-	URL       string
-	CreatedAt string
-	UpdatedAt string
+	ID          string
+	URL         string
+	Description string
+	CreatedAt   string
+	UpdatedAt   string
 }{
-	ID:        "id",
-	URL:       "url",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
+	ID:          "id",
+	URL:         "url",
+	Description: "description",
+	CreatedAt:   "created_at",
+	UpdatedAt:   "updated_at",
 }
 
 // Generated where
@@ -64,6 +67,29 @@ func (w whereHelperstring) LT(x string) qm.QueryMod  { return qmhelper.Where(w.f
 func (w whereHelperstring) LTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
 func (w whereHelperstring) GT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
 func (w whereHelperstring) GTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+
+type whereHelpernull_String struct{ field string }
+
+func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, false, x)
+}
+func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
+	return qmhelper.WhereNullEQ(w.field, true, x)
+}
+func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
+func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
+func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LT, x)
+}
+func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.LTE, x)
+}
+func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GT, x)
+}
+func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
+	return qmhelper.Where(w.field, qmhelper.GTE, x)
+}
 
 type whereHelpernull_Time struct{ field string }
 
@@ -89,15 +115,17 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 }
 
 var LinkWhere = struct {
-	ID        whereHelperint
-	URL       whereHelperstring
-	CreatedAt whereHelpernull_Time
-	UpdatedAt whereHelpernull_Time
+	ID          whereHelperint
+	URL         whereHelperstring
+	Description whereHelpernull_String
+	CreatedAt   whereHelpernull_Time
+	UpdatedAt   whereHelpernull_Time
 }{
-	ID:        whereHelperint{field: "`links`.`id`"},
-	URL:       whereHelperstring{field: "`links`.`url`"},
-	CreatedAt: whereHelpernull_Time{field: "`links`.`created_at`"},
-	UpdatedAt: whereHelpernull_Time{field: "`links`.`updated_at`"},
+	ID:          whereHelperint{field: "`links`.`id`"},
+	URL:         whereHelperstring{field: "`links`.`url`"},
+	Description: whereHelpernull_String{field: "`links`.`description`"},
+	CreatedAt:   whereHelpernull_Time{field: "`links`.`created_at`"},
+	UpdatedAt:   whereHelpernull_Time{field: "`links`.`updated_at`"},
 }
 
 // LinkRels is where relationship names are stored.
@@ -117,8 +145,8 @@ func (*linkR) NewStruct() *linkR {
 type linkL struct{}
 
 var (
-	linkAllColumns            = []string{"id", "url", "created_at", "updated_at"}
-	linkColumnsWithoutDefault = []string{"url"}
+	linkAllColumns            = []string{"id", "url", "description", "created_at", "updated_at"}
+	linkColumnsWithoutDefault = []string{"url", "description"}
 	linkColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	linkPrimaryKeyColumns     = []string{"id"}
 )
