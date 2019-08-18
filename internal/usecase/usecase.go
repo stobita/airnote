@@ -6,7 +6,7 @@ import (
 
 type interactor struct {
 	repository repository
-	outputPort outputPort
+	outputPort OutputPort
 }
 
 // InputPort is usecase input port
@@ -21,9 +21,10 @@ type InputData struct {
 	Description string
 }
 
-type outputPort interface {
+type OutputPort interface {
 	ResponseLinks(o LinksOutputData) error
 	ResponseLink(o LinkOutputData) error
+	ResponseError(err error) error
 }
 
 // LinksOutputData is used by OutputPort
@@ -42,7 +43,7 @@ type repository interface {
 }
 
 // NewInteractor get interactor
-func NewInteractor(r repository, o outputPort) *interactor {
+func NewInteractor(r repository, o OutputPort) *interactor {
 	return &interactor{
 		repository: r,
 		outputPort: o,
@@ -50,10 +51,13 @@ func NewInteractor(r repository, o outputPort) *interactor {
 }
 
 func (i *interactor) AddLink(input InputData) error {
-	model := model.NewLink(model.LinkInput{
+	model, err := model.NewLink(model.LinkInput{
 		URL:         input.URL,
 		Description: input.Description,
 	})
+	if err != nil {
+		return err
+	}
 	if err := i.repository.SaveLink(model); err != nil {
 		return err
 	}

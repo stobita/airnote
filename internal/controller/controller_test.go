@@ -1,6 +1,8 @@
 package controller_test
 
 import (
+	"bytes"
+	"encoding/json"
 	"errors"
 	"net/http"
 	"net/http/httptest"
@@ -35,7 +37,13 @@ func (f *fakeInputPort) AddLink(i usecase.InputData) error {
 
 func TestController_GetLink(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/", nil)
+	body, err := json.Marshal(controller.ExportPostLinkRequestBody{
+		URL: "test",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	req, err := http.NewRequest("GET", "/", bytes.NewBuffer(body))
 	if err != nil {
 		t.Fatalf("Error create request")
 	}
@@ -71,7 +79,7 @@ func TestController_GetLink(t *testing.T) {
 
 func TestController_PostLink(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest("GET", "/", nil)
+	req, err := http.NewRequest("POST", "/", nil)
 	if err != nil {
 		t.Fatalf("Error create request")
 	}
@@ -81,9 +89,8 @@ func TestController_PostLink(t *testing.T) {
 			return inputPort
 		})
 		r := gin.Default()
-		r.GET("/", c.PostLink())
+		r.POST("/", c.PostLink())
 		r.ServeHTTP(w, req)
-
 		if !inputPort.getAddLinkSuccess {
 			t.Error("Failed call input port")
 		}
@@ -96,7 +103,7 @@ func TestController_PostLink(t *testing.T) {
 			return inputPort
 		})
 		r := gin.Default()
-		r.GET("/", c.PostLink())
+		r.POST("/", c.PostLink())
 		r.ServeHTTP(w, req)
 
 		if inputPort.getAddLinkSuccess {

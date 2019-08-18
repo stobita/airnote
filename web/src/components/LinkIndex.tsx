@@ -11,8 +11,8 @@ export const LinkIndex = (props: Props) => {
   return (
     <Wrapper>
       {props.items.map(link => (
-        <Column>
-          <LinkItem key={link.id} item={link} />
+        <Column key={link.id}>
+          <LinkItem item={link} />
         </Column>
       ))}
     </Wrapper>
@@ -26,6 +26,6 @@ const Wrapper = styled.div`
 `;
 
 const Column = styled.div`
-  flex: 0 1 25%;
+  flex: 0 1 20%;
   box-sizing: border-box;
 `;

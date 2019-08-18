@@ -1,5 +1,7 @@
 package model
 
+import "errors"
+
 type Link struct {
 	id          int
 	url         string
@@ -11,11 +13,14 @@ type LinkInput struct {
 	Description string
 }
 
-func NewLink(i LinkInput) *Link {
+func NewLink(i LinkInput) (*Link, error) {
+	if i.URL == "" {
+		return nil, errors.New("URL must set")
+	}
 	return &Link{
 		url:         i.URL,
 		description: i.Description,
-	}
+	}, nil
 }
 
 func (l *Link) GetID() int {

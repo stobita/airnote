@@ -26,7 +26,10 @@ func (r *repository) SaveLink(input *model.Link) error {
 		URL:         input.GetURL(),
 		Description: null.StringFrom(input.GetDescription()),
 	}
-	if err := link.Insert(context.Background(), r.db, boil.Whitelist("url")); err != nil {
+	if err := link.Insert(context.Background(), r.db, boil.Whitelist(
+		"url",
+		"description",
+	)); err != nil {
 		return err
 	}
 	input.SetID(link.ID)
@@ -34,7 +37,6 @@ func (r *repository) SaveLink(input *model.Link) error {
 }
 
 func (r *repository) GetLinks() ([]*model.Link, error) {
-
 	links, err := rdb.Links().All(context.Background(), r.db)
 	if err != nil {
 		return nil, err
@@ -45,7 +47,10 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 			URL:         v.URL,
 			Description: v.Description.String,
 		}
-		m := model.NewLink(input)
+		m, err := model.NewLink(input)
+		if err != nil {
+			return nil, err
+		}
 		m.SetID(v.ID)
 		result = append(result, m)
 	}

@@ -3,12 +3,9 @@ import { Link } from "../model/link";
 
 const resource = "/links";
 
-type CreateLinkPayload = {
+export type CreateLinkPayload = {
   url: string;
-};
-
-type CreateLinkResponse = {
-  url: string;
+  description: string;
 };
 
 const linksRepository = {
