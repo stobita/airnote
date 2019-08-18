@@ -26,6 +26,15 @@ type listJSON struct {
 	Items []interface{} `json:"items"`
 }
 
+type errorJSON struct {
+	Error Error `json:"errors"`
+}
+
+type Error struct {
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+}
+
 func (p *presenter) ResponseLinks(o usecase.LinksOutputData) error {
 	var j listJSON
 	for _, v := range o {
@@ -43,6 +52,15 @@ func (p *presenter) ResponseLink(o usecase.LinkOutputData) error {
 		ID:          o.ID,
 		URL:         o.URL,
 		Description: o.Description,
+	}
+	return json.NewEncoder(p.writer).Encode(j)
+}
+
+func (p *presenter) ResponseError(e error) error {
+	j := errorJSON{
+		Error: Error{
+			Message: e.Error(),
+		},
 	}
 	return json.NewEncoder(p.writer).Encode(j)
 }

@@ -31,11 +31,18 @@ func getEngine(db *sql.DB) (*gin.Engine, error) {
 
 	repo := repository.New(db)
 
-	controller := controller.New(func(w http.ResponseWriter) usecase.InputPort {
-		return usecase.NewInteractor(repo, presenter.New(w))
-	})
+	controller := controller.New(
+		func(o usecase.OutputPort) usecase.InputPort {
+			return usecase.NewInteractor(repo, o)
+		},
+		func(w http.ResponseWriter) usecase.OutputPort {
+			return presenter.New(w)
+		},
+	)
 
 	r.Use(cors.New(cors.Config{
+		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
+		AllowHeaders: []string{"Origin", "Content-Length", "Content-Type"},
 		AllowOrigins: []string{"http://localhost:3000"},
 	}))
 

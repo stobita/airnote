@@ -28,7 +28,10 @@ func TestRepository_SaveLink(t *testing.T) {
 	defer truncate()
 	repo := repository.New(testDB)
 	t.Run("Success save link", func(t *testing.T) {
-		link := model.NewLink(model.LinkInput{URL: "test_url"})
+		link, err := model.NewLink(model.LinkInput{URL: "test_url"})
+		if err != nil {
+			t.Fatal(err)
+		}
 		if err := repo.SaveLink(link); err != nil {
 			t.Fatalf("create error: %s", err)
 		}
