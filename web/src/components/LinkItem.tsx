@@ -11,7 +11,7 @@ interface Props {
 export const LinkItem = (props: Props) => {
   return (
     <Wrapper>
-      <a href={props.item.url}>
+      <a href={props.item.url} target="_blank" rel="noopener noreferrer">
         <DefaultImage />
         <Bottom>
           <p>{props.item.description}</p>

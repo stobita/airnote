@@ -1,5 +1,8 @@
 export default {
+  primary: "#067499",
+  danger: "#DF0139",
   mainWhite: "#fff",
   mainBlack: "#111",
-  borderGray: "#dddddd"
+  mainGray: "#666",
+  borderGray: "#ddd"
 };
