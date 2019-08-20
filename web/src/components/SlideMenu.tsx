@@ -40,7 +40,7 @@ const slideWidth = 500;
 const Inner = styled.div<{ state: TransitionStatus }>`
   padding: 16px 24px;
   box-sizing: border-box;
-  position: absolute;
+  position: fixed;
   right: -${slideWidth}px;
   transition: 0.5s;
   width: ${slideWidth}px;
@@ -48,5 +48,6 @@ const Inner = styled.div<{ state: TransitionStatus }>`
     ${({ state }) => (state === "entered" ? -slideWidth : 0)}px
   );
   min-height: 100vh;
+  height: 100%;
   background: ${colors.mainBlack};
 `;

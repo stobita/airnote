@@ -1,18 +1,26 @@
-import React from "react";
+import React, { useCallback } from "react";
 import { Link } from "../model/link";
 import { LinkItem } from "./LinkItem";
 import styled from "styled-components";
 
 interface Props {
   items: Link[];
+  onSelectItem: (l: Link) => void;
 }
 
 export const LinkIndex = (props: Props) => {
+  const onClickItem = useCallback(
+    (l: Link) => {
+      props.onSelectItem(l);
+    },
+    [props]
+  );
+
   return (
     <Wrapper>
       {props.items.map(link => (
         <Column key={link.id}>
-          <LinkItem item={link} />
+          <LinkItem item={link} onClick={onClickItem} />
         </Column>
       ))}
     </Wrapper>

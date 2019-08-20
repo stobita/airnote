@@ -14,6 +14,7 @@ export const AddButton = (props: Props) => {
     </Button>
   );
 };
+
 const Button = styled.button`
   background: ${colors.mainWhite};
   border: 1px solid ${colors.borderGray};
