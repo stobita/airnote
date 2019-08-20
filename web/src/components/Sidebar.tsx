@@ -19,5 +19,6 @@ const Wrapper = styled.div`
   color: ${colors.mainWhite};
   flex-direction: column;
   min-height: 100vh;
+  height: 100%;
   padding: 16px;
 `;

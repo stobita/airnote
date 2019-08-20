@@ -35,6 +35,32 @@ func (f *fakeInputPort) AddLink(i usecase.InputData) error {
 	return nil
 }
 
+func (f *fakeInputPort) UpdateLink(id int, i usecase.InputData) error {
+	return nil
+}
+
+func (f *fakeInputPort) DeleteLink(id int) error {
+	return nil
+}
+
+type fakeOutputPort struct{}
+
+func (f *fakeOutputPort) ResponseLink(o usecase.LinkOutputData) error {
+	return nil
+}
+
+func (f *fakeOutputPort) ResponseLinks(o usecase.LinksOutputData) error {
+	return nil
+}
+
+func (f *fakeOutputPort) ResponseError(e error) error {
+	return nil
+}
+
+func (f *fakeOutputPort) ResponseNoContent() error {
+	return nil
+}
+
 func TestController_GetLink(t *testing.T) {
 	w := httptest.NewRecorder()
 	body, err := json.Marshal(controller.ExportPostLinkRequestBody{
@@ -49,9 +75,15 @@ func TestController_GetLink(t *testing.T) {
 	}
 	t.Run("Success", func(t *testing.T) {
 		inputPort := &fakeInputPort{}
-		c := controller.New(func(w http.ResponseWriter) usecase.InputPort {
-			return inputPort
-		})
+		outputPort := &fakeOutputPort{}
+		c := controller.New(
+			func(o usecase.OutputPort) usecase.InputPort {
+				return inputPort
+			},
+			func(w http.ResponseWriter) usecase.OutputPort {
+				return outputPort
+			},
+		)
 		r := gin.Default()
 		r.GET("/", c.GetLink())
 		r.ServeHTTP(w, req)
@@ -64,9 +96,15 @@ func TestController_GetLink(t *testing.T) {
 		inputPort := &fakeInputPort{
 			getAllLinksError: true,
 		}
-		c := controller.New(func(w http.ResponseWriter) usecase.InputPort {
-			return inputPort
-		})
+		outputPort := &fakeOutputPort{}
+		c := controller.New(
+			func(o usecase.OutputPort) usecase.InputPort {
+				return inputPort
+			},
+			func(w http.ResponseWriter) usecase.OutputPort {
+				return outputPort
+			},
+		)
 		r := gin.Default()
 		r.GET("/", c.GetLink())
 		r.ServeHTTP(w, req)
@@ -85,9 +123,15 @@ func TestController_PostLink(t *testing.T) {
 	}
 	t.Run("Success", func(t *testing.T) {
 		inputPort := &fakeInputPort{}
-		c := controller.New(func(w http.ResponseWriter) usecase.InputPort {
-			return inputPort
-		})
+		outputPort := &fakeOutputPort{}
+		c := controller.New(
+			func(o usecase.OutputPort) usecase.InputPort {
+				return inputPort
+			},
+			func(w http.ResponseWriter) usecase.OutputPort {
+				return outputPort
+			},
+		)
 		r := gin.Default()
 		r.POST("/", c.PostLink())
 		r.ServeHTTP(w, req)
@@ -99,9 +143,15 @@ func TestController_PostLink(t *testing.T) {
 		inputPort := &fakeInputPort{
 			getAddLinkError: true,
 		}
-		c := controller.New(func(w http.ResponseWriter) usecase.InputPort {
-			return inputPort
-		})
+		outputPort := &fakeOutputPort{}
+		c := controller.New(
+			func(o usecase.OutputPort) usecase.InputPort {
+				return inputPort
+			},
+			func(w http.ResponseWriter) usecase.OutputPort {
+				return outputPort
+			},
+		)
 		r := gin.Default()
 		r.POST("/", c.PostLink())
 		r.ServeHTTP(w, req)

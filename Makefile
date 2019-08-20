@@ -1,10 +1,20 @@
+DEV_COMPOSE=deployments/development/docker-compose.yml
+TEST_COMPOSE=deployments/test/docker-compose.yml
+
+dev-up:
+	docker-compose -f $(DEV_COMPOSE) up -d
+dev-down:
+	docker-compose -f $(DEV_COMPOSE) down
+dev-logs:
+	docker-compose -f $(DEV_COMPOSE) logs -f
 migrate-create:
-	cd deployments/development && docker-compose exec api goose -dir=./db/migrations create $(NAME) sql
+	docker-compose -f $(DEV_COMPOSE) exec api goose -dir=./db/migrations create $(NAME) sql
+
 migrate:
-	cd deployments/development && docker-compose exec api go run cmd/airnote/airnote.go migrate
+	docker-compose -f $(DEV_COMPOSE) exec api go run cmd/airnote/airnote.go migrate
 sqlboiler:
-	cd deployments/development && docker-compose exec api sqlboiler mysql --wipe -o ./internal/repository/rdb -c ./db/sqlboiler.toml -p rdb --no-auto-timestamps
-go-test:
-	cd deployments/test && \
-		docker-compose up --abort-on-container-exit && \
-		docker-compose down --volumes
+	docker-compose -f $(DEV_COMPOSE) exec api sqlboiler mysql --wipe -o ./internal/repository/rdb -c ./db/sqlboiler.toml -p rdb --no-auto-timestamps
+
+test-go:
+		docker-compose -f $(TEST_COMPOSE) up --abort-on-container-exit && \
+		docker-compose -f $(TEST_COMPOSE) down --volumes

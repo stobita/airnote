@@ -38,3 +38,11 @@ func (l *Link) GetDescription() string {
 func (l *Link) SetID(id int) {
 	l.id = id
 }
+
+func (l *Link) SetURL(url string) {
+	l.url = url
+}
+
+func (l *Link) SetDescription(d string) {
+	l.description = d
+}
