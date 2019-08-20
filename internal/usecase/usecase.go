@@ -13,6 +13,8 @@ type interactor struct {
 type InputPort interface {
 	GetAllLinks() error
 	AddLink(i InputData) error
+	UpdateLink(id int, i InputData) error
+	DeleteLink(id int) error
 }
 
 // InputData is used by InputPort
@@ -22,9 +24,10 @@ type InputData struct {
 }
 
 type OutputPort interface {
-	ResponseLinks(o LinksOutputData) error
 	ResponseLink(o LinkOutputData) error
+	ResponseLinks(o LinksOutputData) error
 	ResponseError(err error) error
+	ResponseNoContent() error
 }
 
 // LinksOutputData is used by OutputPort
@@ -38,8 +41,11 @@ type LinkOutputData struct {
 }
 
 type repository interface {
-	SaveLink(input *model.Link) error
+	GetLink(id int) (*model.Link, error)
 	GetLinks() ([]*model.Link, error)
+	CreateLink(input *model.Link) error
+	UpdateLink(*model.Link) error
+	DeleteLink(*model.Link) error
 }
 
 // NewInteractor get interactor
@@ -58,7 +64,7 @@ func (i *interactor) AddLink(input InputData) error {
 	if err != nil {
 		return err
 	}
-	if err := i.repository.SaveLink(model); err != nil {
+	if err := i.repository.CreateLink(model); err != nil {
 		return err
 	}
 	o := LinkOutputData{
@@ -83,4 +89,33 @@ func (i *interactor) GetAllLinks() error {
 		})
 	}
 	return i.outputPort.ResponseLinks(o)
+}
+
+func (i *interactor) UpdateLink(id int, input InputData) error {
+	model, err := i.repository.GetLink(id)
+	if err != nil {
+		return err
+	}
+	model.SetURL(input.URL)
+	model.SetDescription(input.Description)
+	if err := i.repository.UpdateLink(model); err != nil {
+		return err
+	}
+	o := LinkOutputData{
+		ID:          model.GetID(),
+		URL:         model.GetURL(),
+		Description: model.GetDescription(),
+	}
+	return i.outputPort.ResponseLink(o)
+}
+
+func (i *interactor) DeleteLink(id int) error {
+	model, err := i.repository.GetLink(id)
+	if err != nil {
+		return err
+	}
+	if err := i.repository.DeleteLink(model); err != nil {
+		return err
+	}
+	return i.outputPort.ResponseNoContent()
 }

@@ -64,3 +64,8 @@ func (p *presenter) ResponseError(e error) error {
 	}
 	return json.NewEncoder(p.writer).Encode(j)
 }
+
+func (p *presenter) ResponseNoContent() error {
+	// TODO: implement
+	return nil
+}

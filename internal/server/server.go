@@ -50,7 +50,8 @@ func getEngine(db *sql.DB) (*gin.Engine, error) {
 	{
 		v1.GET("/links", controller.GetLink())
 		v1.POST("/links", controller.PostLink())
-
+		v1.PUT("/links/:id", controller.UpdateLink())
+		v1.DELETE("/links/:id", controller.DeleteLink())
 	}
 	return r, nil
 }

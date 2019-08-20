@@ -23,7 +23,7 @@ func TestMain(m *testing.M) {
 	os.Exit(result)
 }
 
-func TestRepository_SaveLink(t *testing.T) {
+func TestRepository_CreateLink(t *testing.T) {
 	testDB, truncate := testutils.GetTestDBConn()
 	defer truncate()
 	repo := repository.New(testDB)
@@ -32,11 +32,33 @@ func TestRepository_SaveLink(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := repo.SaveLink(link); err != nil {
+		if err := repo.CreateLink(link); err != nil {
 			t.Fatalf("create error: %s", err)
 		}
 		if link.GetID() == 0 {
 			t.Errorf("link should be set id")
+		}
+	})
+}
+
+func TestRepository_GetLink(t *testing.T) {
+	testDB, truncate := testutils.GetTestDBConn()
+	defer truncate()
+	repo := repository.New(testDB)
+	t.Run("Success get link", func(t *testing.T) {
+		testData := rdb.Link{URL: "test"}
+		if err := testData.Insert(context.Background(), testDB, boil.Infer()); err != nil {
+			t.Fatal(err)
+		}
+		result, err := repo.GetLink(testData.ID)
+		if err != nil {
+			t.Fatalf("Failed get link: %s", err)
+		}
+		if result.GetID() != testData.ID {
+			t.Fatalf("Want %v but get %v", testData.ID, result.GetID())
+		}
+		if result.GetURL() != testData.URL {
+			t.Fatalf("Want %v but get %v", testData.URL, result.GetURL())
 		}
 	})
 }
