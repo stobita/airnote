@@ -3,7 +3,6 @@ package controller_test
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -13,63 +12,9 @@ import (
 	"github.com/stobita/airnote/internal/usecase"
 )
 
-type fakeInputPort struct {
-	getAllLinksSuccess bool
-	getAllLinksError   bool
-	getAddLinkSuccess  bool
-	getAddLinkError    bool
-}
-
-func (f *fakeInputPort) GetAllLinks() error {
-	if f.getAllLinksError {
-		return errors.New("Fake error")
-	}
-	f.getAllLinksSuccess = true
-	return nil
-}
-func (f *fakeInputPort) AddLink(i usecase.InputData) error {
-	if f.getAddLinkError {
-		return errors.New("Fake error")
-	}
-	f.getAddLinkSuccess = true
-	return nil
-}
-
-func (f *fakeInputPort) UpdateLink(id int, i usecase.InputData) error {
-	return nil
-}
-
-func (f *fakeInputPort) DeleteLink(id int) error {
-	return nil
-}
-
-type fakeOutputPort struct{}
-
-func (f *fakeOutputPort) ResponseLink(o usecase.LinkOutputData) error {
-	return nil
-}
-
-func (f *fakeOutputPort) ResponseLinks(o usecase.LinksOutputData) error {
-	return nil
-}
-
-func (f *fakeOutputPort) ResponseError(e error) error {
-	return nil
-}
-
-func (f *fakeOutputPort) ResponseNoContent() error {
-	return nil
-}
-
 func TestController_GetLink(t *testing.T) {
 	w := httptest.NewRecorder()
-	body, err := json.Marshal(controller.ExportPostLinkRequestBody{
-		URL: "test",
-	})
-	if err != nil {
-		t.Fatal(err)
-	}
-	req, err := http.NewRequest("GET", "/", bytes.NewBuffer(body))
+	req, err := http.NewRequest("GET", "/", nil)
 	if err != nil {
 		t.Fatalf("Error create request")
 	}
@@ -117,7 +62,13 @@ func TestController_GetLink(t *testing.T) {
 
 func TestController_PostLink(t *testing.T) {
 	w := httptest.NewRecorder()
-	req, err := http.NewRequest("POST", "/", nil)
+	body, err := json.Marshal(controller.ExportPostLinkRequestBody{
+		URL: "test",
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	req, err := http.NewRequest("POST", "/", bytes.NewBuffer(body))
 	if err != nil {
 		t.Fatalf("Error create request")
 	}

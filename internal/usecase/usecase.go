@@ -11,10 +11,10 @@ type interactor struct {
 
 // InputPort is usecase input port
 type InputPort interface {
-	GetAllLinks() error
-	AddLink(i InputData) error
-	UpdateLink(id int, i InputData) error
-	DeleteLink(id int) error
+	GetAllLinks()
+	AddLink(i InputData)
+	UpdateLink(id int, i InputData)
+	DeleteLink(id int)
 }
 
 // InputData is used by InputPort
@@ -56,29 +56,35 @@ func NewInteractor(r repository, o OutputPort) *interactor {
 	}
 }
 
-func (i *interactor) AddLink(input InputData) error {
+func (i *interactor) AddLink(input InputData) {
 	model, err := model.NewLink(model.LinkInput{
 		URL:         input.URL,
 		Description: input.Description,
 	})
 	if err != nil {
-		return err
+		i.outputPort.ResponseError(err)
+		return
 	}
 	if err := i.repository.CreateLink(model); err != nil {
-		return err
+		i.outputPort.ResponseError(err)
+		return
 	}
 	o := LinkOutputData{
 		ID:          model.GetID(),
 		URL:         model.GetURL(),
 		Description: model.GetDescription(),
 	}
-	return i.outputPort.ResponseLink(o)
+	if err := i.outputPort.ResponseLink(o); err != nil {
+		i.outputPort.ResponseError(err)
+		return
+	}
 }
 
-func (i *interactor) GetAllLinks() error {
+func (i *interactor) GetAllLinks() {
 	links, err := i.repository.GetLinks()
 	if err != nil {
-		return err
+		i.outputPort.ResponseError(err)
+		return
 	}
 	var o LinksOutputData
 	for _, v := range links {
@@ -88,34 +94,47 @@ func (i *interactor) GetAllLinks() error {
 			Description: v.GetDescription(),
 		})
 	}
-	return i.outputPort.ResponseLinks(o)
+	if err := i.outputPort.ResponseLinks(o); err != nil {
+		i.outputPort.ResponseError(err)
+		return
+	}
 }
 
-func (i *interactor) UpdateLink(id int, input InputData) error {
+func (i *interactor) UpdateLink(id int, input InputData) {
 	model, err := i.repository.GetLink(id)
 	if err != nil {
-		return err
+		i.outputPort.ResponseError(err)
+		return
 	}
 	model.SetURL(input.URL)
 	model.SetDescription(input.Description)
 	if err := i.repository.UpdateLink(model); err != nil {
-		return err
+		i.outputPort.ResponseError(err)
+		return
 	}
 	o := LinkOutputData{
 		ID:          model.GetID(),
 		URL:         model.GetURL(),
 		Description: model.GetDescription(),
 	}
-	return i.outputPort.ResponseLink(o)
+	if err := i.outputPort.ResponseLink(o); err != nil {
+		i.outputPort.ResponseError(err)
+		return
+	}
 }
 
-func (i *interactor) DeleteLink(id int) error {
+func (i *interactor) DeleteLink(id int) {
 	model, err := i.repository.GetLink(id)
 	if err != nil {
-		return err
+		i.outputPort.ResponseError(err)
+		return
 	}
 	if err := i.repository.DeleteLink(model); err != nil {
-		return err
+		i.outputPort.ResponseError(err)
+		return
 	}
-	return i.outputPort.ResponseNoContent()
+	if err := i.outputPort.ResponseNoContent(); err != nil {
+		i.outputPort.ResponseError(err)
+		return
+	}
 }

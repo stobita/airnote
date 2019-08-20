@@ -23,6 +23,7 @@ type putLinkRequestBody postLinkRequestBody
 type inputPortFactory func(o usecase.OutputPort) usecase.InputPort
 type outputPortFactory func(w http.ResponseWriter) usecase.OutputPort
 
+// New create controller
 func New(i inputPortFactory, o outputPortFactory) *controller {
 	return &controller{
 		i,
@@ -34,9 +35,7 @@ func (c *controller) GetLink() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
-		if err := i.GetAllLinks(); err != nil {
-			o.ResponseError(err)
-		}
+		i.GetAllLinks()
 	}
 }
 
@@ -49,12 +48,10 @@ func (c *controller) PostLink() gin.HandlerFunc {
 			o.ResponseError(err)
 			return
 		}
-		if err := i.AddLink(usecase.InputData{
+		i.AddLink(usecase.InputData{
 			URL:         json.URL,
 			Description: json.Description,
-		}); err != nil {
-			o.ResponseError(err)
-		}
+		})
 	}
 }
 
@@ -72,12 +69,10 @@ func (c *controller) UpdateLink() gin.HandlerFunc {
 			o.ResponseError(err)
 			return
 		}
-		if err := i.UpdateLink(id, usecase.InputData{
+		i.UpdateLink(id, usecase.InputData{
 			URL:         json.URL,
 			Description: json.Description,
-		}); err != nil {
-			o.ResponseError(err)
-		}
+		})
 	}
 }
 
@@ -90,9 +85,6 @@ func (c *controller) DeleteLink() gin.HandlerFunc {
 			o.ResponseError(err)
 			return
 		}
-		if err := i.DeleteLink(id); err != nil {
-			o.ResponseError(err)
-			return
-		}
+		i.DeleteLink(id)
 	}
 }
