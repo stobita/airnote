@@ -1,10 +1,13 @@
 import React, { useState, useCallback } from "react";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { LinkPayload } from "../api/linksRepository";
 import colors from "../colors";
 import { Button } from "./Button";
 import { ButtonPair } from "./ButtonPair";
 import { Link } from "../model/link";
+import { TagInput } from "./TagInput";
+import { Input } from "./Input";
+import { Textarea } from "./Textarea";
 
 interface Props {
   initFormValue?: Link;
@@ -17,7 +20,8 @@ export const LinkForm = (props: Props) => {
   const [formValue, setFormValue] = useState<LinkPayload>(
     props.initFormValue || {
       url: "",
-      description: ""
+      description: "",
+      tags: []
     }
   );
 
@@ -30,6 +34,10 @@ export const LinkForm = (props: Props) => {
     },
     []
   );
+
+  const onChangeTag = useCallback((items: string[]) => {
+    setFormValue(prev => ({ ...prev, tags: items }));
+  }, []);
 
   const onSubmit = useCallback(() => {
     if (!formValue.url) {
@@ -45,7 +53,8 @@ export const LinkForm = (props: Props) => {
       });
     setFormValue({
       url: "",
-      description: ""
+      description: "",
+      tags: []
     });
   }, [formValue, props]);
 
@@ -70,6 +79,14 @@ export const LinkForm = (props: Props) => {
         />
       </Field>
       <Field>
+        <TagInput
+          name="tag"
+          placeholder="Tag"
+          value={formValue.tags ? formValue.tags : []}
+          onChange={onChangeTag}
+        />
+      </Field>
+      <Field>
         {props.onCancel ? (
           <ButtonPair
             left={
@@ -89,27 +106,9 @@ export const LinkForm = (props: Props) => {
   );
 };
 
-const FieldItemBase = css`
-  font-size: 16px;
-  width: 100%;
-  padding: 8px;
-  box-sizing: border-box;
-  border-radius: 4px;
+const Field = styled.div`
+  display: flex;
   margin-bottom: 8px;
-`;
-
-const Field = styled.div``;
-const Input = styled.input`
-  ${FieldItemBase}
-  height: 32px;
-  background: ${colors.mainWhite};
-`;
-
-const Textarea = styled.textarea`
-  ${FieldItemBase}
-  background: ${colors.mainWhite};
-  resize: none;
-  height: 128px
 `;
 
 const ErrorMessage = styled.div`

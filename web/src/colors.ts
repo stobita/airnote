@@ -4,5 +4,6 @@ export default {
   mainWhite: "#fff",
   mainBlack: "#111",
   mainGray: "#666",
+  thinGray: "#CCC",
   borderGray: "#ddd"
 };

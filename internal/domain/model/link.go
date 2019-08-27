@@ -6,11 +6,13 @@ type Link struct {
 	id          int
 	url         string
 	description string
+	tags        []*Tag
 }
 
 type LinkInput struct {
 	URL         string
 	Description string
+	Tags        []*Tag
 }
 
 func NewLink(i LinkInput) (*Link, error) {
@@ -20,6 +22,7 @@ func NewLink(i LinkInput) (*Link, error) {
 	return &Link{
 		url:         i.URL,
 		description: i.Description,
+		tags:        i.Tags,
 	}, nil
 }
 
@@ -35,6 +38,10 @@ func (l *Link) GetDescription() string {
 	return l.description
 }
 
+func (l *Link) GetTags() []*Tag {
+	return l.tags
+}
+
 func (l *Link) SetID(id int) {
 	l.id = id
 }
@@ -45,4 +52,8 @@ func (l *Link) SetURL(url string) {
 
 func (l *Link) SetDescription(d string) {
 	l.description = d
+}
+
+func (l *Link) SetTags(tags []*Tag) {
+	l.tags = tags
 }

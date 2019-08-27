@@ -18,7 +18,8 @@ export const EditLinkForm = (props: Props) => {
       return linkRepository
         .updateLink(props.target.id, {
           url: input.url,
-          description: input.description
+          description: input.description,
+          tags: input.tags
         })
         .then(() => {
           return;

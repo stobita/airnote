@@ -17,9 +17,14 @@ func New(w http.ResponseWriter) *presenter {
 }
 
 type linkJSON struct {
-	ID          int    `json:"id"`
-	URL         string `json:"url"`
-	Description string `json:"description"`
+	ID          int       `json:"id"`
+	URL         string    `json:"url"`
+	Description string    `json:"description"`
+	Tags        []tagJSON `json:"tags"`
+}
+
+type tagJSON struct {
+	Text string `json:"text"`
 }
 
 type listJSON struct {
@@ -36,22 +41,43 @@ type Error struct {
 }
 
 func (p *presenter) ResponseLinks(o usecase.LinksOutputData) error {
-	var j listJSON
+	j := listJSON{Items: []interface{}{}}
 	for _, v := range o {
+		tagListJSON := []tagJSON{}
+		for _, v := range v.Tags {
+			tagListJSON = append(tagListJSON, tagJSON{
+				Text: v.Text,
+			})
+		}
 		j.Items = append(j.Items, &linkJSON{
 			ID:          v.ID,
 			URL:         v.URL,
 			Description: v.Description,
+			Tags:        tagListJSON,
 		})
 	}
 	return json.NewEncoder(p.writer).Encode(j)
 }
 
 func (p *presenter) ResponseLink(o usecase.LinkOutputData) error {
+	tags := []tagJSON{}
+	for _, v := range o.Tags {
+		tags = append(tags, tagJSON{
+			Text: v.Text,
+		})
+	}
 	j := linkJSON{
 		ID:          o.ID,
 		URL:         o.URL,
 		Description: o.Description,
+		Tags:        tags,
+	}
+	return json.NewEncoder(p.writer).Encode(j)
+}
+
+func (p *presenter) ResponseTag(o usecase.TagOutputData) error {
+	j := tagJSON{
+		Text: o.Text,
 	}
 	return json.NewEncoder(p.writer).Encode(j)
 }
