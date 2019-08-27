@@ -3,6 +3,7 @@ import { Link } from "../model/link";
 import { ReactComponent as DefaultImage } from "../assets/default.svg";
 import styled from "styled-components";
 import colors from "../colors";
+import { TagBadge } from "./TagBadge";
 
 interface Props {
   item: Link;
@@ -18,7 +19,16 @@ export const LinkItem = (props: Props) => {
     <Wrapper onClick={handleOnClick}>
       <DefaultImage />
       <Bottom>
-        <p>{props.item.description}</p>
+        <p>
+          {props.item.description === ""
+            ? "no description"
+            : props.item.description}
+        </p>
+        <Tags>
+          {props.item.tags.map(v => (
+            <TagBadge key={v.id}>{v.text}</TagBadge>
+          ))}
+        </Tags>
       </Bottom>
     </Wrapper>
   );
@@ -35,4 +45,8 @@ const Wrapper = styled.div`
 
 const Bottom = styled.div`
   padding: 8px;
+`;
+
+const Tags = styled.div`
+  display: flex;
 `;

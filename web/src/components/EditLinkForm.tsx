@@ -31,9 +31,15 @@ export const EditLinkForm = (props: Props) => {
     [props.target.id]
   );
 
+  const formInitValue: LinkPayload = {
+    url: props.target.url,
+    description: props.target.description,
+    tags: props.target.tags.map(v => v.text)
+  };
+
   return (
     <LinkForm
-      initFormValue={props.target}
+      initFormValue={formInitValue}
       onSubmit={onSubmit}
       afterSubmit={props.afterSubmit}
       onCancel={props.onCancel}

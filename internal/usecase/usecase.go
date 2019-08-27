@@ -13,6 +13,7 @@ type interactor struct {
 
 type repository interface {
 	linkRepository
+	tagRepository
 }
 
 type linkRepository interface {
@@ -21,6 +22,11 @@ type linkRepository interface {
 	SaveLink(input *model.Link) error
 	UpdateLink(*model.Link) error
 	DeleteLink(*model.Link) error
+}
+
+type tagRepository interface {
+	GetTagByText(text string) (*model.Tag, error)
+	SaveTag(input *model.Tag) error
 }
 
 // NewInteractor get interactor
@@ -34,13 +40,24 @@ func NewInteractor(r repository, o OutputPort) *interactor {
 func (i *interactor) AddLink(input LinkInputData) {
 	tags := []*model.Tag{}
 	for _, v := range input.Tags {
-		tag, err := model.NewTag(model.TagInput{
-			Text: v,
-		})
+		tag, err := i.repository.GetTagByText(v)
 		if err != nil {
 			log.Print(err)
 			i.outputPort.ResponseError(err)
 			return
+		}
+		if tag == nil {
+			tag, err = model.NewTag(model.TagInput{Text: v})
+			if err != nil {
+				log.Print(err)
+				i.outputPort.ResponseError(err)
+				return
+			}
+			if err := i.repository.SaveTag(tag); err != nil {
+				log.Print(err)
+				i.outputPort.ResponseError(err)
+				return
+			}
 		}
 		tags = append(tags, tag)
 	}
@@ -88,10 +105,18 @@ func (i *interactor) GetAllLinks() {
 	}
 	var o LinksOutputData
 	for _, v := range links {
+		tagOutput := []*TagOutputData{}
+		for _, v := range v.GetTags() {
+			tagOutput = append(tagOutput, &TagOutputData{
+				ID:   v.GetID(),
+				Text: v.GetText(),
+			})
+		}
 		o = append(o, &LinkOutputData{
 			ID:          v.GetID(),
 			URL:         v.GetURL(),
 			Description: v.GetDescription(),
+			Tags:        tagOutput,
 		})
 	}
 	if err := i.outputPort.ResponseLinks(o); err != nil {
@@ -110,18 +135,32 @@ func (i *interactor) UpdateLink(id int, input LinkInputData) {
 	}
 	link.SetURL(input.URL)
 	link.SetDescription(input.Description)
+
+	// TODO: fix duplicate AddLink
 	tags := []*model.Tag{}
 	for _, v := range input.Tags {
-		tag, err := model.NewTag(model.TagInput{
-			Text: v,
-		})
+		tag, err := i.repository.GetTagByText(v)
 		if err != nil {
 			log.Print(err)
 			i.outputPort.ResponseError(err)
 			return
 		}
+		if tag == nil {
+			tag, err = model.NewTag(model.TagInput{Text: v})
+			if err != nil {
+				log.Print(err)
+				i.outputPort.ResponseError(err)
+				return
+			}
+			if err := i.repository.SaveTag(tag); err != nil {
+				log.Print(err)
+				i.outputPort.ResponseError(err)
+				return
+			}
+		}
 		tags = append(tags, tag)
 	}
+
 	link.SetTags(tags)
 	if err := i.repository.UpdateLink(link); err != nil {
 		log.Print(err)

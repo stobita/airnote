@@ -4,13 +4,12 @@ import { LinkPayload } from "../api/linksRepository";
 import colors from "../colors";
 import { Button } from "./Button";
 import { ButtonPair } from "./ButtonPair";
-import { Link } from "../model/link";
 import { TagInput } from "./TagInput";
 import { Input } from "./Input";
 import { Textarea } from "./Textarea";
 
 interface Props {
-  initFormValue?: Link;
+  initFormValue?: LinkPayload;
   onSubmit: (p: LinkPayload) => Promise<void>;
   onCancel?: () => void;
   afterSubmit: () => void;

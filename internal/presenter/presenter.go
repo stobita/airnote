@@ -24,6 +24,7 @@ type linkJSON struct {
 }
 
 type tagJSON struct {
+	ID   int    `json:"id"`
 	Text string `json:"text"`
 }
 
@@ -46,6 +47,7 @@ func (p *presenter) ResponseLinks(o usecase.LinksOutputData) error {
 		tagListJSON := []tagJSON{}
 		for _, v := range v.Tags {
 			tagListJSON = append(tagListJSON, tagJSON{
+				ID:   v.ID,
 				Text: v.Text,
 			})
 		}

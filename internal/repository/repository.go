@@ -27,7 +27,16 @@ func New(db *sql.DB) *repository {
 
 func (r *repository) GetLink(id int) (*model.Link, error) {
 	ctx := context.Background()
-	link, err := rdb.FindLink(ctx, r.db, id)
+	// link, err := rdb.FindLink(ctx, r.db, id)
+	link, err := rdb.Links(
+		rdb.LinkWhere.ID.EQ(id),
+		qm.Load(
+			qm.Rels(
+				rdb.LinkRels.LinksTags,
+				rdb.LinksTagRels.Tag,
+			),
+		),
+	).One(ctx, r.db)
 	if err != nil {
 		return nil, err
 	}
@@ -60,35 +69,39 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 	ctx := context.Background()
 	links, err := rdb.Links(
 		qm.Load(
-			rdb.LinkRels.LinksTags,
-			qm.Load(rdb.LinksTagRels.Tag),
+			qm.Rels(
+				rdb.LinkRels.LinksTags,
+				rdb.LinksTagRels.Tag,
+			),
 		),
 	).All(ctx, r.db)
 	if err != nil {
 		return nil, err
 	}
 	var result []*model.Link
-	for _, v := range links {
+	for _, link := range links {
 		var tags []*model.Tag
-		for _, v := range v.R.LinksTags {
+		for _, v := range link.R.LinksTags {
 			tag, err := model.NewTag(model.TagInput{
 				Text: v.R.Tag.Text,
 			})
 			if err != nil {
 				return nil, err
 			}
+			log.Printf("tagid: %#v", v.R.Tag.ID)
+			tag.SetID(v.R.Tag.ID)
 			tags = append(tags, tag)
 		}
 		input := model.LinkInput{
-			URL:         v.URL,
-			Description: v.Description.String,
+			URL:         link.URL,
+			Description: link.Description.String,
 			Tags:        tags,
 		}
 		m, err := model.NewLink(input)
 		if err != nil {
 			return nil, err
 		}
-		m.SetID(v.ID)
+		m.SetID(link.ID)
 		result = append(result, m)
 	}
 	return result, nil
@@ -96,11 +109,6 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 
 func (r *repository) SaveLink(input *model.Link) error {
 	ctx := context.Background()
-	if len(input.GetTags()) > 0 {
-		if err := r.findOrSaveTags(input.GetTags()); err != nil {
-			return err
-		}
-	}
 	link := rdb.Link{
 		URL:         input.GetURL(),
 		Description: null.StringFrom(input.GetDescription()),
@@ -112,6 +120,7 @@ func (r *repository) SaveLink(input *model.Link) error {
 		return errors.Wrap(err, "Link.Insert error")
 	}
 	input.SetID(link.ID)
+
 	if len(input.GetTags()) == 0 {
 		return nil
 	}
@@ -128,6 +137,35 @@ func (r *repository) SaveLink(input *model.Link) error {
 	}
 
 	return nil
+}
+
+func (r *repository) SaveTag(tag *model.Tag) error {
+	ctx := context.Background()
+	dbTag := rdb.Tag{
+		Text: tag.GetText(),
+	}
+	if err := dbTag.Insert(ctx, r.db, boil.Whitelist("text")); err != nil {
+		return errors.Wrap(err, "Insert error")
+	}
+	tag.SetID(dbTag.ID)
+	return nil
+}
+
+func (r *repository) GetTagByText(text string) (*model.Tag, error) {
+	ctx := context.Background()
+	tag, err := rdb.Tags(rdb.TagWhere.Text.EQ(text)).One(ctx, r.db)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, errors.Wrap(err, "Failed One")
+	}
+	model, err := model.NewTag(model.TagInput{Text: tag.Text})
+	if err != nil {
+		return nil, errors.Wrap(err, "NewTag error")
+	}
+	model.SetID(tag.ID)
+	return model, nil
 }
 
 func (r *repository) findOrSaveTags(input []*model.Tag) error {
@@ -153,6 +191,11 @@ func (r *repository) findOrSaveTags(input []*model.Tag) error {
 		}
 		tag.SetID(v.ID)
 		savedTags = append(savedTags, tag)
+	}
+
+	input = savedTags
+	for _, v := range input {
+		log.Printf("finder: %#v", v)
 	}
 
 	// t - saved
@@ -192,44 +235,41 @@ func (r *repository) findOrSaveTags(input []*model.Tag) error {
 		v.SetID(tag.ID)
 		input = append(input, v)
 	}
-	for _, v := range input {
-		log.Printf("tag: %#v", v)
-	}
 	return nil
 }
 
 func (r *repository) UpdateLink(input *model.Link) error {
 	ctx := context.Background()
-	if len(input.GetTags()) > 0 {
-		if err := r.findOrSaveTags(input.GetTags()); err != nil {
-			return err
-		}
-	}
-
-	link, err := rdb.FindLink(ctx, r.db, input.GetID())
+	// dbLink, err := rdb.FindLink(ctx, r.db, input.GetID())
+	dbLink, err := rdb.Links(rdb.LinkWhere.ID.EQ(input.GetID()), qm.Load(
+		qm.Rels(
+			rdb.LinkRels.LinksTags,
+			rdb.LinksTagRels.Tag,
+		),
+	)).One(ctx, r.db)
 	if err != nil {
 		return err
 	}
-	link.URL = input.GetURL()
-	link.Description = null.StringFrom(input.GetDescription())
-	if _, err := link.Update(ctx, r.db, boil.Whitelist(
+	dbLink.URL = input.GetURL()
+	dbLink.Description = null.StringFrom(input.GetDescription())
+	if _, err := dbLink.Update(ctx, r.db, boil.Whitelist(
 		"url",
 		"description",
 	)); err != nil {
 		return err
 	}
 
-	var beforeText []string
-	for _, v := range link.R.LinksTags {
-		beforeText = append(beforeText, v.R.Tag.Text)
+	var beforeTagText []string
+	for _, v := range dbLink.R.LinksTags {
+		beforeTagText = append(beforeTagText, v.R.Tag.Text)
 	}
 
-	var afterText []string
+	var afterTagText []string
 	for _, v := range input.GetTags() {
-		afterText = append(afterText, v.GetText())
+		afterTagText = append(afterTagText, v.GetText())
 	}
 
-	tagDiff := util.StringArrayDiff(beforeText, afterText)
+	tagDiff := util.StringArrayDiff(beforeTagText, afterTagText)
 
 	addTagIDs := []interface{}{}
 	for _, v := range tagDiff.Inc {
@@ -241,7 +281,7 @@ func (r *repository) UpdateLink(input *model.Link) error {
 	}
 	removeTagIDs := []interface{}{}
 	for _, v := range tagDiff.Dec {
-		for _, vv := range link.R.LinksTags {
+		for _, vv := range dbLink.R.LinksTags {
 			if v == vv.R.Tag.Text {
 				removeTagIDs = append(removeTagIDs, vv.R.Tag.ID)
 			}
@@ -256,12 +296,12 @@ func (r *repository) UpdateLink(input *model.Link) error {
 		}
 		rels = append(rels, i)
 	}
-	if err := link.AddLinksTags(ctx, r.db, true, rels...); err != nil {
+	if err := dbLink.AddLinksTags(ctx, r.db, true, rels...); err != nil {
 		return err
 	}
 
 	// remove tag
-	if _, err := link.LinksTags(qm.WhereIn("tag_id in ?", removeTagIDs...)).DeleteAll(ctx, r.db); err != nil {
+	if _, err := dbLink.LinksTags(qm.WhereIn("tag_id in ?", removeTagIDs...)).DeleteAll(ctx, r.db); err != nil {
 		return err
 	}
 
@@ -270,8 +310,16 @@ func (r *repository) UpdateLink(input *model.Link) error {
 
 func (r *repository) DeleteLink(model *model.Link) error {
 	ctx := context.Background()
-	link, err := rdb.FindLink(ctx, r.db, model.GetID())
+	link, err := rdb.Links(rdb.LinkWhere.ID.EQ(model.GetID()), qm.Load(
+		qm.Rels(
+			rdb.LinkRels.LinksTags,
+			rdb.LinksTagRels.Tag,
+		),
+	)).One(ctx, r.db)
 	if err != nil {
+		return err
+	}
+	if _, err := link.R.LinksTags.DeleteAll(ctx, r.db); err != nil {
 		return err
 	}
 	if _, err := link.Delete(ctx, r.db); err != nil {

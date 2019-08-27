@@ -8,6 +8,7 @@ import colors from "../colors";
 import { repositoryFactory } from "../api/repositoryFactory";
 import { EditLinkForm } from "./EditLinkForm";
 import { DeleteConfirmation } from "./DeleteConfirmation";
+import { TagBadge } from "./TagBadge";
 
 const linkRepository = repositoryFactory.get("links");
 
@@ -70,6 +71,11 @@ export const LinkDetail = (props: Props) => {
           )}
         </Row>
         <p>{props.item.description}</p>
+        <div>
+          {props.item.tags.map(v => (
+            <TagBadge key={v.id}>{v.text}</TagBadge>
+          ))}
+        </div>
       </>
     );
   };
