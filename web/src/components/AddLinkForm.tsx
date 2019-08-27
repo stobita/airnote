@@ -14,7 +14,8 @@ export const AddLinkForm = (props: Props) => {
     return linkRepository
       .createLink({
         url: input.url,
-        description: input.description
+        description: input.description,
+        tags: input.tags
       })
       .then(() => {
         return;

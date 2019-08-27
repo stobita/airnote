@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testLinks(t *testing.T) {
+func testTags(t *testing.T) {
 	t.Parallel()
 
-	query := Links()
+	query := Tags()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testLinksDelete(t *testing.T) {
+func testTagsDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testLinksDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testLinksDelete(t *testing.T) {
 	}
 }
 
-func testLinksQueryDeleteAll(t *testing.T) {
+func testTagsQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testLinksQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := Links().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := Tags().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testLinksQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testLinksSliceDeleteAll(t *testing.T) {
+func testTagsSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testLinksSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := LinkSlice{o}
+	slice := TagSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testLinksSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testLinksSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testLinksExists(t *testing.T) {
+func testTagsExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testLinksExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := LinkExists(ctx, tx, o.ID)
+	e, err := TagExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if Link exists: %s", err)
+		t.Errorf("Unable to check if Tag exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected LinkExists to return true, but got false.")
+		t.Errorf("Expected TagExists to return true, but got false.")
 	}
 }
 
-func testLinksFind(t *testing.T) {
+func testTagsFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testLinksFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	linkFound, err := FindLink(ctx, tx, o.ID)
+	tagFound, err := FindTag(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if linkFound == nil {
+	if tagFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testLinksBind(t *testing.T) {
+func testTagsBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testLinksBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = Links().Bind(ctx, tx, o); err != nil {
+	if err = Tags().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testLinksOne(t *testing.T) {
+func testTagsOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testLinksOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := Links().One(ctx, tx); err != nil {
+	if x, err := Tags().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testLinksAll(t *testing.T) {
+func testTagsAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	linkOne := &Link{}
-	linkTwo := &Link{}
-	if err = randomize.Struct(seed, linkOne, linkDBTypes, false, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	tagOne := &Tag{}
+	tagTwo := &Tag{}
+	if err = randomize.Struct(seed, tagOne, tagDBTypes, false, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
-	if err = randomize.Struct(seed, linkTwo, linkDBTypes, false, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	if err = randomize.Struct(seed, tagTwo, tagDBTypes, false, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = linkOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = tagOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = linkTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = tagTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := Links().All(ctx, tx)
+	slice, err := Tags().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testLinksAll(t *testing.T) {
 	}
 }
 
-func testLinksCount(t *testing.T) {
+func testTagsCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	linkOne := &Link{}
-	linkTwo := &Link{}
-	if err = randomize.Struct(seed, linkOne, linkDBTypes, false, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	tagOne := &Tag{}
+	tagTwo := &Tag{}
+	if err = randomize.Struct(seed, tagOne, tagDBTypes, false, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
-	if err = randomize.Struct(seed, linkTwo, linkDBTypes, false, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	if err = randomize.Struct(seed, tagTwo, tagDBTypes, false, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = linkOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = tagOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = linkTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = tagTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testLinksCount(t *testing.T) {
 	}
 }
 
-func linkBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func linkAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func linkAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func linkBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func linkAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func linkBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func linkAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func linkBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func linkAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Link) error {
-	*o = Link{}
+func tagAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *Tag) error {
+	*o = Tag{}
 	return nil
 }
 
-func testLinksHooks(t *testing.T) {
+func testTagsHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &Link{}
-	o := &Link{}
+	empty := &Tag{}
+	o := &Tag{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, linkDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize Link object: %s", err)
+	if err = randomize.Struct(seed, o, tagDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize Tag object: %s", err)
 	}
 
-	AddLinkHook(boil.BeforeInsertHook, linkBeforeInsertHook)
+	AddTagHook(boil.BeforeInsertHook, tagBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	linkBeforeInsertHooks = []LinkHook{}
+	tagBeforeInsertHooks = []TagHook{}
 
-	AddLinkHook(boil.AfterInsertHook, linkAfterInsertHook)
+	AddTagHook(boil.AfterInsertHook, tagAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	linkAfterInsertHooks = []LinkHook{}
+	tagAfterInsertHooks = []TagHook{}
 
-	AddLinkHook(boil.AfterSelectHook, linkAfterSelectHook)
+	AddTagHook(boil.AfterSelectHook, tagAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	linkAfterSelectHooks = []LinkHook{}
+	tagAfterSelectHooks = []TagHook{}
 
-	AddLinkHook(boil.BeforeUpdateHook, linkBeforeUpdateHook)
+	AddTagHook(boil.BeforeUpdateHook, tagBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	linkBeforeUpdateHooks = []LinkHook{}
+	tagBeforeUpdateHooks = []TagHook{}
 
-	AddLinkHook(boil.AfterUpdateHook, linkAfterUpdateHook)
+	AddTagHook(boil.AfterUpdateHook, tagAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	linkAfterUpdateHooks = []LinkHook{}
+	tagAfterUpdateHooks = []TagHook{}
 
-	AddLinkHook(boil.BeforeDeleteHook, linkBeforeDeleteHook)
+	AddTagHook(boil.BeforeDeleteHook, tagBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	linkBeforeDeleteHooks = []LinkHook{}
+	tagBeforeDeleteHooks = []TagHook{}
 
-	AddLinkHook(boil.AfterDeleteHook, linkAfterDeleteHook)
+	AddTagHook(boil.AfterDeleteHook, tagAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	linkAfterDeleteHooks = []LinkHook{}
+	tagAfterDeleteHooks = []TagHook{}
 
-	AddLinkHook(boil.BeforeUpsertHook, linkBeforeUpsertHook)
+	AddTagHook(boil.BeforeUpsertHook, tagBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	linkBeforeUpsertHooks = []LinkHook{}
+	tagBeforeUpsertHooks = []TagHook{}
 
-	AddLinkHook(boil.AfterUpsertHook, linkAfterUpsertHook)
+	AddTagHook(boil.AfterUpsertHook, tagAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	linkAfterUpsertHooks = []LinkHook{}
+	tagAfterUpsertHooks = []TagHook{}
 }
 
-func testLinksInsert(t *testing.T) {
+func testTagsInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testLinksInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testLinksInsert(t *testing.T) {
 	}
 }
 
-func testLinksInsertWhitelist(t *testing.T) {
+func testTagsInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(linkColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(tagColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,18 +494,18 @@ func testLinksInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testLinkToManyLinksTags(t *testing.T) {
+func testTagToManyLinksTags(t *testing.T) {
 	var err error
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a Link
+	var a Tag
 	var b, c LinksTag
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	if err = randomize.Struct(seed, &a, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	if err := a.Insert(ctx, tx, boil.Infer()); err != nil {
@@ -519,8 +519,8 @@ func testLinkToManyLinksTags(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b.LinkID = a.ID
-	c.LinkID = a.ID
+	b.TagID = a.ID
+	c.TagID = a.ID
 
 	if err = b.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Fatal(err)
@@ -536,10 +536,10 @@ func testLinkToManyLinksTags(t *testing.T) {
 
 	bFound, cFound := false, false
 	for _, v := range check {
-		if v.LinkID == b.LinkID {
+		if v.TagID == b.TagID {
 			bFound = true
 		}
-		if v.LinkID == c.LinkID {
+		if v.TagID == c.TagID {
 			cFound = true
 		}
 	}
@@ -551,8 +551,8 @@ func testLinkToManyLinksTags(t *testing.T) {
 		t.Error("expected to find c")
 	}
 
-	slice := LinkSlice{&a}
-	if err = a.L.LoadLinksTags(ctx, tx, false, (*[]*Link)(&slice), nil); err != nil {
+	slice := TagSlice{&a}
+	if err = a.L.LoadLinksTags(ctx, tx, false, (*[]*Tag)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if got := len(a.R.LinksTags); got != 2 {
@@ -572,18 +572,18 @@ func testLinkToManyLinksTags(t *testing.T) {
 	}
 }
 
-func testLinkToManyAddOpLinksTags(t *testing.T) {
+func testTagToManyAddOpLinksTags(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a Link
+	var a Tag
 	var b, c, d, e LinksTag
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, linkDBTypes, false, strmangle.SetComplement(linkPrimaryKeyColumns, linkColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, tagDBTypes, false, strmangle.SetComplement(tagPrimaryKeyColumns, tagColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	foreigners := []*LinksTag{&b, &c, &d, &e}
@@ -617,17 +617,17 @@ func testLinkToManyAddOpLinksTags(t *testing.T) {
 		first := x[0]
 		second := x[1]
 
-		if a.ID != first.LinkID {
-			t.Error("foreign key was wrong value", a.ID, first.LinkID)
+		if a.ID != first.TagID {
+			t.Error("foreign key was wrong value", a.ID, first.TagID)
 		}
-		if a.ID != second.LinkID {
-			t.Error("foreign key was wrong value", a.ID, second.LinkID)
+		if a.ID != second.TagID {
+			t.Error("foreign key was wrong value", a.ID, second.TagID)
 		}
 
-		if first.R.Link != &a {
+		if first.R.Tag != &a {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
-		if second.R.Link != &a {
+		if second.R.Tag != &a {
 			t.Error("relationship was not added properly to the foreign slice")
 		}
 
@@ -648,14 +648,14 @@ func testLinkToManyAddOpLinksTags(t *testing.T) {
 	}
 }
 
-func testLinksReload(t *testing.T) {
+func testTagsReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -670,14 +670,14 @@ func testLinksReload(t *testing.T) {
 	}
 }
 
-func testLinksReloadAll(t *testing.T) {
+func testTagsReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -687,21 +687,21 @@ func testLinksReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := LinkSlice{o}
+	slice := TagSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testLinksSelect(t *testing.T) {
+func testTagsSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -711,7 +711,7 @@ func testLinksSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := Links().All(ctx, tx)
+	slice, err := Tags().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -722,25 +722,25 @@ func testLinksSelect(t *testing.T) {
 }
 
 var (
-	linkDBTypes = map[string]string{`ID`: `int`, `URL`: `text`, `Description`: `text`, `CreatedAt`: `datetime`, `UpdatedAt`: `datetime`}
-	_           = bytes.MinRead
+	tagDBTypes = map[string]string{`ID`: `int`, `Text`: `text`, `CreatedAt`: `datetime`, `UpdatedAt`: `datetime`}
+	_          = bytes.MinRead
 )
 
-func testLinksUpdate(t *testing.T) {
+func testTagsUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(linkPrimaryKeyColumns) {
+	if 0 == len(tagPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(linkAllColumns) == len(linkPrimaryKeyColumns) {
+	if len(tagAllColumns) == len(tagPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -750,7 +750,7 @@ func testLinksUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -759,8 +759,8 @@ func testLinksUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -770,18 +770,18 @@ func testLinksUpdate(t *testing.T) {
 	}
 }
 
-func testLinksSliceUpdateAll(t *testing.T) {
+func testTagsSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(linkAllColumns) == len(linkPrimaryKeyColumns) {
+	if len(tagAllColumns) == len(tagPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Link{}
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := &Tag{}
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -791,7 +791,7 @@ func testLinksSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -800,18 +800,18 @@ func testLinksSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, linkDBTypes, true, linkPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	if err = randomize.Struct(seed, o, tagDBTypes, true, tagPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(linkAllColumns, linkPrimaryKeyColumns) {
-		fields = linkAllColumns
+	if strmangle.StringSliceMatch(tagAllColumns, tagPrimaryKeyColumns) {
+		fields = tagAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			linkAllColumns,
-			linkPrimaryKeyColumns,
+			tagAllColumns,
+			tagPrimaryKeyColumns,
 		)
 	}
 
@@ -829,7 +829,7 @@ func testLinksSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := LinkSlice{o}
+	slice := TagSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -837,32 +837,32 @@ func testLinksSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testLinksUpsert(t *testing.T) {
+func testTagsUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(linkAllColumns) == len(linkPrimaryKeyColumns) {
+	if len(tagAllColumns) == len(tagPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
-	if len(mySQLLinkUniqueColumns) == 0 {
+	if len(mySQLTagUniqueColumns) == 0 {
 		t.Skip("Skipping table with no unique columns to conflict on")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := Link{}
-	if err = randomize.Struct(seed, &o, linkDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	o := Tag{}
+	if err = randomize.Struct(seed, &o, tagDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert Link: %s", err)
+		t.Errorf("Unable to upsert Tag: %s", err)
 	}
 
-	count, err := Links().Count(ctx, tx)
+	count, err := Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -871,15 +871,15 @@ func testLinksUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, linkDBTypes, false, linkPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Link struct: %s", err)
+	if err = randomize.Struct(seed, &o, tagDBTypes, false, tagPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Tag struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert Link: %s", err)
+		t.Errorf("Unable to upsert Tag: %s", err)
 	}
 
-	count, err = Links().Count(ctx, tx)
+	count, err = Tags().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

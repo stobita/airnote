@@ -7,4 +7,8 @@ import "testing"
 
 func TestUpsert(t *testing.T) {
 	t.Run("Links", testLinksUpsert)
+
+	t.Run("LinksTags", testLinksTagsUpsert)
+
+	t.Run("Tags", testTagsUpsert)
 }

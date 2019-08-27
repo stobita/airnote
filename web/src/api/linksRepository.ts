@@ -6,11 +6,20 @@ const resource = "/links";
 export type LinkPayload = {
   url: string;
   description: string;
+  tags?: string[];
 };
 
 const linksRepository = {
   async getAllLinks(): Promise<Link[]> {
-    const res = await repository.get<Collection<Link>>(`${resource}`);
+    const res = await repository
+      .get<Collection<Link>>(`${resource}`)
+      .catch(e => {
+        console.log(e);
+        return null;
+      });
+    if (res == null || !res.data.items) {
+      return [];
+    }
     return res.data.items;
   },
   async createLink(payload: LinkPayload): Promise<Link> {

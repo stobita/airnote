@@ -18,7 +18,9 @@ export const Home = () => {
   const [selectedLink, setSelectedLink] = useState<Link>();
 
   useEffect(() => {
-    linkRepository.getAllLinks().then(links => setLinks(links));
+    linkRepository.getAllLinks().then(links => {
+      setLinks(links);
+    });
   }, []);
 
   const showForm = useCallback(() => {

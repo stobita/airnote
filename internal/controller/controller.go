@@ -14,11 +14,17 @@ type controller struct {
 }
 
 type postLinkRequestBody struct {
-	URL         string `json:"url"`
-	Description string `json:"description"`
+	URL         string   `json:"url"`
+	Description string   `json:"description"`
+	Tags        []string `json:"tags"`
 }
 
 type putLinkRequestBody postLinkRequestBody
+
+type postLinkTagRequestBody struct {
+	LinkID int    `json:"linkId"`
+	Text   string `json:"text"`
+}
 
 type inputPortFactory func(o usecase.OutputPort) usecase.InputPort
 type outputPortFactory func(w http.ResponseWriter) usecase.OutputPort
@@ -48,9 +54,10 @@ func (c *controller) PostLink() gin.HandlerFunc {
 			o.ResponseError(err)
 			return
 		}
-		i.AddLink(usecase.InputData{
+		i.AddLink(usecase.LinkInputData{
 			URL:         json.URL,
 			Description: json.Description,
+			Tags:        json.Tags,
 		})
 	}
 }
@@ -69,9 +76,10 @@ func (c *controller) UpdateLink() gin.HandlerFunc {
 			o.ResponseError(err)
 			return
 		}
-		i.UpdateLink(id, usecase.InputData{
+		i.UpdateLink(id, usecase.LinkInputData{
 			URL:         json.URL,
 			Description: json.Description,
+			Tags:        json.Tags,
 		})
 	}
 }

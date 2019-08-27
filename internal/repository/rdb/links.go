@@ -130,10 +130,14 @@ var LinkWhere = struct {
 
 // LinkRels is where relationship names are stored.
 var LinkRels = struct {
-}{}
+	LinksTags string
+}{
+	LinksTags: "LinksTags",
+}
 
 // linkR is where relationships are stored.
 type linkR struct {
+	LinksTags LinksTagSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -424,6 +428,175 @@ func (q linkQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 	}
 
 	return count > 0, nil
+}
+
+// LinksTags retrieves all the links_tag's LinksTags with an executor.
+func (o *Link) LinksTags(mods ...qm.QueryMod) linksTagQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("`links_tags`.`link_id`=?", o.ID),
+	)
+
+	query := LinksTags(queryMods...)
+	queries.SetFrom(query.Query, "`links_tags`")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"`links_tags`.*"})
+	}
+
+	return query
+}
+
+// LoadLinksTags allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (linkL) LoadLinksTags(ctx context.Context, e boil.ContextExecutor, singular bool, maybeLink interface{}, mods queries.Applicator) error {
+	var slice []*Link
+	var object *Link
+
+	if singular {
+		object = maybeLink.(*Link)
+	} else {
+		slice = *maybeLink.(*[]*Link)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &linkR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &linkR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`links_tags`), qm.WhereIn(`link_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load links_tags")
+	}
+
+	var resultSlice []*LinksTag
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice links_tags")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on links_tags")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for links_tags")
+	}
+
+	if len(linksTagAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.LinksTags = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &linksTagR{}
+			}
+			foreign.R.Link = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.ID == foreign.LinkID {
+				local.R.LinksTags = append(local.R.LinksTags, foreign)
+				if foreign.R == nil {
+					foreign.R = &linksTagR{}
+				}
+				foreign.R.Link = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
+// AddLinksTags adds the given related objects to the existing relationships
+// of the link, optionally inserting them as new records.
+// Appends related to o.R.LinksTags.
+// Sets related.R.Link appropriately.
+func (o *Link) AddLinksTags(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*LinksTag) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.LinkID = o.ID
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE `links_tags` SET %s WHERE %s",
+				strmangle.SetParamNames("`", "`", 0, []string{"link_id"}),
+				strmangle.WhereClause("`", "`", 0, linksTagPrimaryKeyColumns),
+			)
+			values := []interface{}{o.ID, rel.ID}
+
+			if boil.DebugMode {
+				fmt.Fprintln(boil.DebugWriter, updateQuery)
+				fmt.Fprintln(boil.DebugWriter, values)
+			}
+
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.LinkID = o.ID
+		}
+	}
+
+	if o.R == nil {
+		o.R = &linkR{
+			LinksTags: related,
+		}
+	} else {
+		o.R.LinksTags = append(o.R.LinksTags, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &linksTagR{
+				Link: o,
+			}
+		} else {
+			rel.R.Link = o
+		}
+	}
+	return nil
 }
 
 // Links retrieves all the records using an executor.
