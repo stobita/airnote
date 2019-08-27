@@ -6,7 +6,7 @@ const resource = "/links";
 export type LinkPayload = {
   url: string;
   description: string;
-  tags?: string[];
+  tags: string[];
 };
 
 const linksRepository = {
