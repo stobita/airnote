@@ -23,7 +23,14 @@ func TestMain(m *testing.M) {
 	os.Exit(result)
 }
 
-func TestRepository_CreateLink(t *testing.T) {
+func TestNew(t *testing.T) {
+	t.Run("Success new repository", func(t *testing.T) {
+		testDB, _ := testutils.GetTestDBConn()
+		_ = repository.New(testDB)
+	})
+}
+
+func TestRepository_SaveLink(t *testing.T) {
 	testDB, truncate := testutils.GetTestDBConn()
 	defer truncate()
 	repo := repository.New(testDB)
@@ -32,13 +39,32 @@ func TestRepository_CreateLink(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		if err := repo.CreateLink(link); err != nil {
-			t.Fatalf("create error: %s", err)
+		if err := repo.SaveLink(link); err != nil {
+			t.Fatalf("save error: %s", err)
 		}
 		if link.GetID() == 0 {
 			t.Errorf("link should be set id")
 		}
 	})
+}
+
+func TestRepository_SaveTag(t *testing.T) {
+	testDB, truncate := testutils.GetTestDBConn()
+	defer truncate()
+	repo := repository.New(testDB)
+	t.Run("Success save tag", func(t *testing.T) {
+		tag, err := model.NewTag(model.TagInput{Text: "test_tag"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := repo.SaveTag(tag); err != nil {
+			t.Fatalf("save error: %s", err)
+		}
+		if tag.GetID() == 0 {
+			t.Errorf("tag should be set id")
+		}
+	})
+
 }
 
 func TestRepository_GetLink(t *testing.T) {
@@ -63,6 +89,56 @@ func TestRepository_GetLink(t *testing.T) {
 	})
 }
 
+func TestRepository_DeleteLink(t *testing.T) {
+	testDB, truncate := testutils.GetTestDBConn()
+	defer truncate()
+	repo := repository.New(testDB)
+	t.Run("Success delete link", func(t *testing.T) {
+		link, err := model.NewLink(model.LinkInput{URL: "test_url"})
+		if err != nil {
+			t.Fatal(err)
+		}
+		if err := repo.SaveLink(link); err != nil {
+			t.Fatal(err)
+		}
+		if err := repo.DeleteLink(link); err != nil {
+			t.Fatalf("delete error: %s", err)
+		}
+		after, err := repo.GetLink(link.GetID())
+		if err != nil {
+			t.Fatal(err)
+		}
+		if after != nil {
+			t.Fatalf("Want nil but get %v", after)
+		}
+	})
+	t.Run("Success delete link with related tags", func(t *testing.T) {
+		// TODO
+	})
+}
+
+func TestRepository_GetTagByText(t *testing.T) {
+	testDB, truncate := testutils.GetTestDBConn()
+	defer truncate()
+	repo := repository.New(testDB)
+	t.Run("Success get link", func(t *testing.T) {
+		testData := rdb.Tag{Text: "test"}
+		if err := testData.Insert(context.Background(), testDB, boil.Infer()); err != nil {
+			t.Fatal(err)
+		}
+		result, err := repo.GetTagByText("test")
+		if err != nil {
+			t.Fatalf("Failed get tag: %s", err)
+		}
+		if result.GetID() != testData.ID {
+			t.Fatalf("Want %v but get %v", testData.ID, result.GetID())
+		}
+		if result.GetText() != testData.Text {
+			t.Fatalf("Want %v but get %v", testData.Text, result.GetText())
+		}
+	})
+}
+
 func TestRepository_GetLinks(t *testing.T) {
 	testDB, truncate := testutils.GetTestDBConn()
 	defer truncate()
@@ -74,8 +150,9 @@ func TestRepository_GetLinks(t *testing.T) {
 			rdb.Link{URL: "test_2"},
 			rdb.Link{URL: "test_3"},
 		}
+		ctx := context.Background()
 		for _, v := range testData {
-			if err := v.Insert(context.Background(), testDB, boil.Infer()); err != nil {
+			if err := v.Insert(ctx, testDB, boil.Infer()); err != nil {
 				t.Fatalf("error set test data: %s", err)
 			}
 		}
