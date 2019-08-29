@@ -7,7 +7,7 @@ import (
 
 	"github.com/stobita/airnote/internal/presenter"
 	"github.com/stobita/airnote/internal/usecase"
-	"github.com/stobita/airnote/testutils"
+	"github.com/stobita/airnote/internal/util"
 )
 
 func TestPresenter_ResponseLinks(t *testing.T) {
@@ -32,13 +32,14 @@ func TestPresenter_ResponseLinks(t *testing.T) {
 					{
 						"id": 1,
 						"url": "test",
-						"description": "test"
+						"description": "test",
+						"tags": []
 					}
 				]
 			}
 		`
 
-		if match, err := testutils.JSONStringEqual(string(body), expect); err != nil {
+		if match, err := util.JSONStringEqual(string(body), expect); err != nil {
 			t.Errorf("Invalid result: %s", body)
 		} else if !match {
 			t.Errorf("want %s but get %s", expect, body)
@@ -64,11 +65,12 @@ func TestPresenter_ResponseLink(t *testing.T) {
 			{
 				"id": 1,
 				"url": "test",
-				"description": "test"
+				"description": "test",
+				"tags": []
 			}
 		`
 
-		if match, err := testutils.JSONStringEqual(string(body), expect); err != nil {
+		if match, err := util.JSONStringEqual(string(body), expect); err != nil {
 			t.Errorf("Invalid result: %s", body)
 		} else if !match {
 			t.Errorf("want %s but get %s", expect, body)

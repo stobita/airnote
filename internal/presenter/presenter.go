@@ -77,13 +77,6 @@ func (p *presenter) ResponseLink(o usecase.LinkOutputData) error {
 	return json.NewEncoder(p.writer).Encode(j)
 }
 
-func (p *presenter) ResponseTag(o usecase.TagOutputData) error {
-	j := tagJSON{
-		Text: o.Text,
-	}
-	return json.NewEncoder(p.writer).Encode(j)
-}
-
 func (p *presenter) ResponseError(e error) error {
 	j := errorJSON{
 		Error: Error{
