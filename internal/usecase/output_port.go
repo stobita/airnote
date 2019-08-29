@@ -3,7 +3,6 @@ package usecase
 type OutputPort interface {
 	ResponseLink(o LinkOutputData) error
 	ResponseLinks(o LinksOutputData) error
-	ResponseTag(o TagOutputData) error
 
 	ResponseError(err error) error
 	ResponseNoContent() error

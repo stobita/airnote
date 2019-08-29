@@ -37,6 +37,9 @@ func (r *repository) GetLink(id int) (*model.Link, error) {
 			),
 		),
 	).One(ctx, r.db)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}

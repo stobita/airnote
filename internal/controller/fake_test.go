@@ -16,7 +16,7 @@ func (f *fakeInputPort) GetAllLinks() {
 	f.getAllLinksSuccess = true
 	return
 }
-func (f *fakeInputPort) AddLink(i usecase.InputData) {
+func (f *fakeInputPort) AddLink(i usecase.LinkInputData) {
 	if f.getAddLinkError {
 		return
 	}
@@ -24,7 +24,7 @@ func (f *fakeInputPort) AddLink(i usecase.InputData) {
 	return
 }
 
-func (f *fakeInputPort) UpdateLink(id int, i usecase.InputData) {
+func (f *fakeInputPort) UpdateLink(id int, i usecase.LinkInputData) {
 	return
 }
 
