@@ -67,6 +67,17 @@ func (p *presenter) ResponseLinks(o usecase.LinksOutputData) error {
 	return json.NewEncoder(p.writer).Encode(j)
 }
 
+func (p *presenter) ResponseTags(o usecase.TagsOutputData) error {
+	j := listJSON{Items: []interface{}{}}
+	for _, v := range o {
+		j.Items = append(j.Items, &tagJSON{
+			ID:   v.ID,
+			Text: v.Text,
+		})
+	}
+	return json.NewEncoder(p.writer).Encode(j)
+}
+
 func (p *presenter) ResponseLink(o usecase.LinkOutputData) error {
 	tags := []tagJSON{}
 	for _, v := range o.Tags {

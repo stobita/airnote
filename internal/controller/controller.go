@@ -37,7 +37,7 @@ func New(i inputPortFactory, o outputPortFactory) *controller {
 	}
 }
 
-func (c *controller) GetLink() gin.HandlerFunc {
+func (c *controller) GetLinks() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
@@ -107,5 +107,28 @@ func (c *controller) GetLinkOriginal() gin.HandlerFunc {
 			return
 		}
 		i.GetLinkOriginal(id)
+	}
+}
+
+func (c *controller) GetTags() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		o := c.outputPortFactory(ctx.Writer)
+		i := c.inputPortFactory(o)
+		i.GetAllTags()
+
+	}
+}
+
+func (c *controller) GetTagLinks() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		o := c.outputPortFactory(ctx.Writer)
+		i := c.inputPortFactory(o)
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			o.ResponseError(err)
+			return
+		}
+		i.GetTaggedLinks(id)
+
 	}
 }

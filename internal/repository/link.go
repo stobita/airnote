@@ -41,10 +41,10 @@ func (r *repository) GetLink(id int) (*model.Link, error) {
 		Title:       title,
 		Description: link.Description.String,
 	})
-	m.SetID(link.ID)
 	if err != nil {
 		return nil, err
 	}
+	m.SetID(link.ID)
 	if len(link.R.LinksTags) == 0 {
 		return m, nil
 	}
@@ -78,10 +78,21 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 	if err != nil {
 		return nil, errors.Wrap(err, "get All error")
 	}
+	result, err := makeLinksModel(links)
+	if err != nil {
+		return nil, errors.Wrap(err, "setLinksResult error")
+	}
+	return result, nil
+}
+
+func makeLinksModel(links rdb.LinkSlice) ([]*model.Link, error) {
 	var result []*model.Link
 	for _, link := range links {
 		var tags []*model.Tag
 		for _, v := range link.R.LinksTags {
+			if v.R.Tag == nil {
+				break
+			}
 			tag, err := model.NewTag(model.TagInput{
 				Text: v.R.Tag.Text,
 			})
@@ -263,4 +274,79 @@ func (r *repository) DeleteLink(model *model.Link) error {
 	}
 	model = nil
 	return nil
+}
+
+func (r *repository) GetLinksByTagID(tagID int) ([]*model.Link, error) {
+	ctx := context.Background()
+	links, err := rdb.Links(
+		qm.Load(
+			qm.Rels(
+				rdb.LinkRels.LinksTags,
+				rdb.LinksTagRels.Tag,
+			),
+		),
+		qm.Load(
+			rdb.LinkRels.LinkOriginal,
+		),
+		qm.InnerJoin("links_tags on links.id = links_tags.link_id"),
+		rdb.LinksTagWhere.TagID.EQ(tagID),
+	).All(ctx, r.db)
+	if err != nil {
+		return nil, err
+	}
+	result, err := makeLinksModel(links)
+	if err != nil {
+		return nil, errors.Wrap(err, "setLinksResult error")
+	}
+	return result, nil
+}
+
+func (r *repository) GetTag(id int) (*model.Tag, error) {
+	ctx := context.Background()
+	tagDB, err := rdb.Tags(
+		rdb.TagWhere.ID.EQ(id),
+	).One(ctx, r.db)
+	if err == sql.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, err
+	}
+	tag, err := model.NewTag(model.TagInput{
+		Text: tagDB.Text,
+	})
+	if err != nil {
+		return nil, err
+	}
+	tag.SetID(tagDB.ID)
+	return tag, nil
+}
+
+func (r *repository) GetTags() ([]*model.Tag, error) {
+	ctx := context.Background()
+	tags, err := rdb.Tags().All(ctx, r.db)
+	if err != nil {
+		return nil, err
+	}
+	result, err := makeTagsModel(tags)
+	if err != nil {
+		return nil, errors.Wrap(err, "makeTagsModel error")
+	}
+	return result, nil
+}
+
+func makeTagsModel(tags rdb.TagSlice) ([]*model.Tag, error) {
+	var result []*model.Tag
+	for _, tag := range tags {
+		input := model.TagInput{
+			Text: tag.Text,
+		}
+		m, err := model.NewTag(input)
+		if err != nil {
+			return nil, err
+		}
+		m.SetID(tag.ID)
+		result = append(result, m)
+	}
+	return result, nil
 }
