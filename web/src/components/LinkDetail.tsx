@@ -70,6 +70,7 @@ export const LinkDetail = (props: Props) => {
             </Operator>
           )}
         </Row>
+        <Title>{props.item.title}</Title>
         <p>{props.item.description}</p>
         <div>
           {props.item.tags.map(v => (
@@ -133,4 +134,9 @@ const DeleteIcon = styled(DeleteIconImage)`
 const Anchor = styled.a`
   color: ${colors.mainWhite};
   flex: 5;
+`;
+
+const Title = styled.p`
+  font-size: 1.2rem;
+  font-weight: bold;
 `;

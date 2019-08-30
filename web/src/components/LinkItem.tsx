@@ -19,6 +19,7 @@ export const LinkItem = (props: Props) => {
     <Wrapper onClick={handleOnClick}>
       <DefaultImage />
       <Bottom>
+        <Title>{props.item.title && props.item.title}</Title>
         <p>
           {props.item.description === ""
             ? "no description"
@@ -49,4 +50,8 @@ const Bottom = styled.div`
 
 const Tags = styled.div`
   display: flex;
+`;
+
+const Title = styled.p`
+  font-weight: bold;
 `;

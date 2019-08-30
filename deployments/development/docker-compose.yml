@@ -12,7 +12,7 @@ services:
       - ../../:/airnote
     depends_on:
       - db
-      - redis
+      # - redis
     environment:
       MYSQL_DBNAME: airnote
       MYSQL_USER: airnote
@@ -35,14 +35,14 @@ services:
       - db-data:/var/lib/mysql
     ports:
       - '3306:3306'
-  redis:
-    image: "redis:5.0.5-alpine"
-    ports:
-      - "6379:6379"
-    volumes:
-      - redis-data:/data
+  # redis:
+  #   image: "redis:5.0.5-alpine"
+  #   ports:
+  #     - "6379:6379"
+  #   volumes:
+  #     - redis-data:/data
 volumes:
   db-data:
     driver: local
-  redis-data:
-    driver: local
+  # redis-data:
+  #   driver: local

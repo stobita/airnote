@@ -4,11 +4,13 @@
 package rdb
 
 var TableNames = struct {
-	Links     string
-	LinksTags string
-	Tags      string
+	LinkOriginals string
+	Links         string
+	LinksTags     string
+	Tags          string
 }{
-	Links:     "links",
-	LinksTags: "links_tags",
-	Tags:      "tags",
+	LinkOriginals: "link_originals",
+	Links:         "links",
+	LinksTags:     "links_tags",
+	Tags:          "tags",
 }

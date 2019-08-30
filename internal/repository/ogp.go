@@ -1,12 +1,17 @@
 package repository
 
 import (
-	"errors"
+	"context"
 	"io"
+	"log"
 	"net/http"
-	"strconv"
 	"strings"
 
+	"github.com/pkg/errors"
+
+	"github.com/stobita/airnote/internal/repository/rdb"
+	"github.com/volatiletech/null"
+	"github.com/volatiletech/sqlboiler/boil"
 	"golang.org/x/net/html"
 )
 
@@ -15,6 +20,7 @@ func (r *repository) GetLinkTitle(url string) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	log.Printf("fetch link: %s", url)
 	res, err := r.httpClient.Do(req)
 	if err != nil {
 		return "", err
@@ -60,9 +66,15 @@ func findTitle(body io.Reader) (string, error) {
 	return title, nil
 }
 
+// TODO: fix dependency
 func (r *repository) SaveLinkTitle(title string, linkID int) error {
-	if err := r.redisClient.Set(strconv.Itoa(linkID), title, 0).Err(); err != nil {
-		return err
+	ctx := context.Background()
+	origin := rdb.LinkOriginal{
+		LinkID: linkID,
+		Title:  null.StringFrom(title),
+	}
+	if err := origin.Insert(ctx, r.db, boil.Whitelist("link_id", "title")); err != nil {
+		return errors.Wrap(err, "Insert error")
 	}
 	return nil
 }

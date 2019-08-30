@@ -1,5 +1,5 @@
 import repository, { Collection } from "./repository";
-import { Link } from "../model/link";
+import { Link, LinkOriginal } from "../model/link";
 
 const resource = "/links";
 
@@ -32,6 +32,12 @@ const linksRepository = {
   },
   async deleteLink(id: number) {
     await repository.delete(`${resource}/${id}`);
+  },
+  async getLinkOriginal(id: number) {
+    const res = await repository.get<LinkOriginal>(
+      `${resource}/${id}/original`
+    );
+    return res.data;
   }
 };
 

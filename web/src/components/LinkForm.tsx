@@ -10,9 +10,9 @@ import { Textarea } from "./Textarea";
 
 interface Props {
   initFormValue?: LinkPayload;
-  onSubmit: (p: LinkPayload) => Promise<void>;
+  onSubmit: (p: LinkPayload) => Promise<number>;
   onCancel?: () => void;
-  afterSubmit: () => void;
+  afterSubmit: (id: number) => void;
 }
 
 export const LinkForm = (props: Props) => {
@@ -44,8 +44,8 @@ export const LinkForm = (props: Props) => {
     }
     props
       .onSubmit(formValue)
-      .then(() => {
-        props.afterSubmit();
+      .then(id => {
+        props.afterSubmit(id);
       })
       .catch(e => {
         setFormError("unexpected error");

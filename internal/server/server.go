@@ -6,7 +6,6 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
-	"github.com/go-redis/redis"
 	"github.com/stobita/airnote/internal/controller"
 	"github.com/stobita/airnote/internal/infrastructure"
 	"github.com/stobita/airnote/internal/presenter"
@@ -21,22 +20,21 @@ func Run() error {
 		return err
 	}
 	defer db.Close()
-	redisClient, err := infrastructure.NewRedisClient()
 	if err != nil {
 		return err
 	}
 	httpClient := http.DefaultClient
-	engine, err := getEngine(db, httpClient, redisClient)
+	engine, err := getEngine(db, httpClient)
 	if err != nil {
 		return err
 	}
 	return engine.Run()
 }
 
-func getEngine(db *sql.DB, httpClient *http.Client, redisClient *redis.Client) (*gin.Engine, error) {
+func getEngine(db *sql.DB, httpClient *http.Client) (*gin.Engine, error) {
 	r := gin.Default()
 
-	repo := repository.New(db, httpClient, redisClient)
+	repo := repository.New(db, httpClient)
 
 	controller := controller.New(
 		func(o usecase.OutputPort) usecase.InputPort {
@@ -59,6 +57,9 @@ func getEngine(db *sql.DB, httpClient *http.Client, redisClient *redis.Client) (
 		v1.POST("/links", controller.PostLink())
 		v1.PUT("/links/:id", controller.UpdateLink())
 		v1.DELETE("/links/:id", controller.DeleteLink())
+
+		// NOTE: when implement websocket, close this route
+		v1.GET("/links/:id/original", controller.GetLinkOriginal())
 	}
 	return r, nil
 }

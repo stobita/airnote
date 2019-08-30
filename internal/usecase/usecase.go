@@ -120,6 +120,7 @@ func (i *interactor) GetAllLinks() {
 		}
 		o = append(o, &LinkOutputData{
 			ID:          v.GetID(),
+			Title:       v.GetTitle(),
 			URL:         v.GetURL(),
 			Description: v.GetDescription(),
 			Tags:        tagOutput,
@@ -207,4 +208,33 @@ func (i *interactor) DeleteLink(id int) {
 		i.outputPort.ResponseError(err)
 		return
 	}
+}
+
+func (i *interactor) GetLinkOriginal(id int) {
+	link, err := i.repository.GetLink(id)
+	if err != nil {
+		log.Printf("GetLink error: %s", err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+	title, err := i.repository.GetLinkTitle(link.GetURL())
+	if err != nil {
+		log.Printf("GetLinkTitle error: %s", err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+	if err := i.repository.SaveLinkTitle(title, link.GetID()); err != nil {
+		log.Printf("GetLinkTitle error: %s", err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+	o := LinkOriginalOutputData{
+		Title: title,
+	}
+	if err := i.outputPort.ResponseLinkOriginal(o); err != nil {
+		log.Print(err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+
 }

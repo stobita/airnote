@@ -32,7 +32,18 @@ export const Home = () => {
     setDetailOpen(false);
   }, []);
 
-  const updateLinks = useCallback(() => {
+  const handleAfterCreate = useCallback(async id => {
+    const links = await linkRepository.getAllLinks();
+    setLinks(links);
+    const original = await linkRepository.getLinkOriginal(id);
+    const newlinks = links.map(i =>
+      i.id === id ? { ...i, title: original.title } : i
+    );
+    console.log(newlinks);
+    setLinks(newlinks);
+  }, []);
+
+  const handleAfterUpdate = useCallback(() => {
     linkRepository.getAllLinks().then(links => {
       setLinks(links);
       if (selectedLink) {
@@ -56,13 +67,13 @@ export const Home = () => {
   const SlideMenuContent = () => {
     switch (true) {
       case formOpen:
-        return <AddLinkForm afterSubmit={updateLinks} />;
+        return <AddLinkForm afterSubmit={handleAfterCreate} />;
       case detailOpen:
         if (selectedLink) {
           return (
             <LinkDetail
               item={selectedLink}
-              afterUpdate={updateLinks}
+              afterUpdate={handleAfterUpdate}
               afterDelete={handleAfterDelete}
             />
           );
