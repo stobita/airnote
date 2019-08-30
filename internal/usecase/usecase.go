@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"errors"
 	"log"
 
 	"github.com/stobita/airnote/internal/domain/model"
@@ -20,12 +21,15 @@ type repository interface {
 type linkRepository interface {
 	GetLink(id int) (*model.Link, error)
 	GetLinks() ([]*model.Link, error)
+	GetLinksByTagID(tagID int) ([]*model.Link, error)
 	SaveLink(input *model.Link) error
 	UpdateLink(*model.Link) error
 	DeleteLink(*model.Link) error
 }
 
 type tagRepository interface {
+	GetTag(id int) (*model.Tag, error)
+	GetTags() ([]*model.Tag, error)
 	GetTagByText(text string) (*model.Tag, error)
 	SaveTag(input *model.Tag) error
 }
@@ -109,23 +113,9 @@ func (i *interactor) GetAllLinks() {
 		i.outputPort.ResponseError(err)
 		return
 	}
-	var o LinksOutputData
-	for _, v := range links {
-		tagOutput := []*TagOutputData{}
-		for _, v := range v.GetTags() {
-			tagOutput = append(tagOutput, &TagOutputData{
-				ID:   v.GetID(),
-				Text: v.GetText(),
-			})
-		}
-		o = append(o, &LinkOutputData{
-			ID:          v.GetID(),
-			Title:       v.GetTitle(),
-			URL:         v.GetURL(),
-			Description: v.GetDescription(),
-			Tags:        tagOutput,
-		})
-	}
+
+	o := makeLinksOutputData(links)
+
 	if err := i.outputPort.ResponseLinks(o); err != nil {
 		log.Print(err)
 		i.outputPort.ResponseError(err)
@@ -237,4 +227,50 @@ func (i *interactor) GetLinkOriginal(id int) {
 		return
 	}
 
+}
+
+func (i *interactor) GetTaggedLinks(tagID int) {
+	tag, err := i.repository.GetTag(tagID)
+	if err != nil {
+		log.Printf("GetTag error: %s", err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+	if tag == nil {
+		i.outputPort.ResponseError(errors.New("Invalid tag id"))
+		return
+	}
+	links, err := i.repository.GetLinksByTagID(tag.GetID())
+	if err != nil {
+		log.Printf("GetLinksByTagID error: %s", err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+	o := makeLinksOutputData(links)
+	if err := i.outputPort.ResponseLinks(o); err != nil {
+		log.Print(err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+}
+
+func (i *interactor) GetAllTags() {
+	tags, err := i.repository.GetTags()
+	if err != nil {
+		log.Printf("GetTags error: %s", err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+	var o TagsOutputData
+	for _, v := range tags {
+		o = append(o, &TagOutputData{
+			ID:   v.GetID(),
+			Text: v.GetText(),
+		})
+	}
+	if err := i.outputPort.ResponseTags(o); err != nil {
+		log.Print(err)
+		i.outputPort.ResponseError(err)
+		return
+	}
 }

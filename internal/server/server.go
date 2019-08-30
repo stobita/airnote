@@ -53,10 +53,13 @@ func getEngine(db *sql.DB, httpClient *http.Client) (*gin.Engine, error) {
 
 	v1 := r.Group("/api/v1")
 	{
-		v1.GET("/links", controller.GetLink())
+		v1.GET("/links", controller.GetLinks())
 		v1.POST("/links", controller.PostLink())
 		v1.PUT("/links/:id", controller.UpdateLink())
 		v1.DELETE("/links/:id", controller.DeleteLink())
+
+		v1.GET("/tags", controller.GetTags())
+		v1.GET("/tags/:id/links", controller.GetTagLinks())
 
 		// NOTE: when implement websocket, close this route
 		v1.GET("/links/:id/original", controller.GetLinkOriginal())

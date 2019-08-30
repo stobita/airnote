@@ -8,6 +8,9 @@ type InputPort interface {
 	DeleteLink(id int)
 
 	GetLinkOriginal(id int)
+
+	GetAllTags()
+	GetTaggedLinks(tagID int)
 }
 
 // LinkInputData is used by InputPort
