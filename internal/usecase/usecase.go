@@ -14,6 +14,7 @@ type interactor struct {
 type repository interface {
 	linkRepository
 	tagRepository
+	ogpRepository
 }
 
 type linkRepository interface {
@@ -27,6 +28,11 @@ type linkRepository interface {
 type tagRepository interface {
 	GetTagByText(text string) (*model.Tag, error)
 	SaveTag(input *model.Tag) error
+}
+
+type ogpRepository interface {
+	GetLinkTitle(url string) (string, error)
+	SaveLinkTitle(title string, linkID int) error
 }
 
 // NewInteractor get interactor
@@ -188,12 +194,12 @@ func (i *interactor) UpdateLink(id int, input LinkInputData) {
 }
 
 func (i *interactor) DeleteLink(id int) {
-	model, err := i.repository.GetLink(id)
+	link, err := i.repository.GetLink(id)
 	if err != nil {
 		i.outputPort.ResponseError(err)
 		return
 	}
-	if err := i.repository.DeleteLink(model); err != nil {
+	if err := i.repository.DeleteLink(link); err != nil {
 		i.outputPort.ResponseError(err)
 		return
 	}

@@ -12,6 +12,7 @@ services:
       - ../../:/airnote
     depends_on:
       - db
+      - redis
     environment:
       MYSQL_DBNAME: airnote
       MYSQL_USER: airnote
@@ -20,6 +21,8 @@ services:
       MYSQL_PORT: 3306
       MYSQL_SKIPSQLCMD: "true"
       MYSQL_SSLMODE: "false"
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
   db:
     image: mysql:5.7
     environment:
@@ -32,6 +35,14 @@ services:
       - db-data:/var/lib/mysql
     ports:
       - '3306:3306'
+  redis:
+    image: "redis:5.0.5-alpine"
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
 volumes:
   db-data:
+    driver: local
+  redis-data:
     driver: local

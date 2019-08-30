@@ -6,7 +6,9 @@ import (
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/go-redis/redis"
 	"github.com/stobita/airnote/internal/controller"
+	"github.com/stobita/airnote/internal/infrastructure"
 	"github.com/stobita/airnote/internal/presenter"
 	"github.com/stobita/airnote/internal/repository"
 	"github.com/stobita/airnote/internal/usecase"
@@ -14,22 +16,27 @@ import (
 
 // Run api server
 func Run() error {
-	db, err := repository.NewDBConn()
+	db, err := infrastructure.NewDBConn()
 	if err != nil {
 		return err
 	}
 	defer db.Close()
-	engine, err := getEngine(db)
+	redisClient, err := infrastructure.NewRedisClient()
+	if err != nil {
+		return err
+	}
+	httpClient := http.DefaultClient
+	engine, err := getEngine(db, httpClient, redisClient)
 	if err != nil {
 		return err
 	}
 	return engine.Run()
 }
 
-func getEngine(db *sql.DB) (*gin.Engine, error) {
+func getEngine(db *sql.DB, httpClient *http.Client, redisClient *redis.Client) (*gin.Engine, error) {
 	r := gin.Default()
 
-	repo := repository.New(db)
+	repo := repository.New(db, httpClient, redisClient)
 
 	controller := controller.New(
 		func(o usecase.OutputPort) usecase.InputPort {
