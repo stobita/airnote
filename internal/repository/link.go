@@ -24,6 +24,7 @@ func (r *repository) GetLink(id int) (*model.Link, error) {
 				rdb.LinksTagRels.Tag,
 			),
 		),
+		qm.Load(rdb.LinkRels.LinkOriginal),
 	).One(ctx, r.db)
 	if err == sql.ErrNoRows {
 		return nil, nil
@@ -31,8 +32,13 @@ func (r *repository) GetLink(id int) (*model.Link, error) {
 	if err != nil {
 		return nil, err
 	}
+	title := ""
+	if link.R.LinkOriginal != nil {
+		title = link.R.LinkOriginal.Title.String
+	}
 	m, err := model.NewLink(model.LinkInput{
 		URL:         link.URL,
+		Title:       title,
 		Description: link.Description.String,
 	})
 	m.SetID(link.ID)
@@ -65,9 +71,12 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 				rdb.LinksTagRels.Tag,
 			),
 		),
+		qm.Load(
+			rdb.LinkRels.LinkOriginal,
+		),
 	).All(ctx, r.db)
 	if err != nil {
-		return nil, err
+		return nil, errors.Wrap(err, "get All error")
 	}
 	var result []*model.Link
 	for _, link := range links {
@@ -82,8 +91,15 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 			tag.SetID(v.R.Tag.ID)
 			tags = append(tags, tag)
 		}
+
+		title := ""
+		if link.R.LinkOriginal != nil {
+			title = link.R.LinkOriginal.Title.String
+		}
+
 		input := model.LinkInput{
 			URL:         link.URL,
+			Title:       title,
 			Description: link.Description.String,
 			Tags:        tags,
 		}

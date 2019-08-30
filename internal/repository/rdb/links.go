@@ -50,15 +50,6 @@ var LinkColumns = struct {
 
 // Generated where
 
-type whereHelperint struct{ field string }
-
-func (w whereHelperint) EQ(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
-func (w whereHelperint) NEQ(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
-func (w whereHelperint) LT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
-func (w whereHelperint) LTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
-func (w whereHelperint) GT(x int) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
-func (w whereHelperint) GTE(x int) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-
 type whereHelperstring struct{ field string }
 
 func (w whereHelperstring) EQ(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
@@ -67,52 +58,6 @@ func (w whereHelperstring) LT(x string) qm.QueryMod  { return qmhelper.Where(w.f
 func (w whereHelperstring) LTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
 func (w whereHelperstring) GT(x string) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
 func (w whereHelperstring) GTE(x string) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
-
-type whereHelpernull_String struct{ field string }
-
-func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
-type whereHelpernull_Time struct{ field string }
-
-func (w whereHelpernull_Time) EQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_Time) NEQ(x null.Time) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_Time) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_Time) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-func (w whereHelpernull_Time) LT(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_Time) LTE(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_Time) GT(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
 
 var LinkWhere = struct {
 	ID          whereHelperint
@@ -130,14 +75,17 @@ var LinkWhere = struct {
 
 // LinkRels is where relationship names are stored.
 var LinkRels = struct {
-	LinksTags string
+	LinkOriginal string
+	LinksTags    string
 }{
-	LinksTags: "LinksTags",
+	LinkOriginal: "LinkOriginal",
+	LinksTags:    "LinksTags",
 }
 
 // linkR is where relationships are stored.
 type linkR struct {
-	LinksTags LinksTagSlice
+	LinkOriginal *LinkOriginal
+	LinksTags    LinksTagSlice
 }
 
 // NewStruct creates a new relationship struct
@@ -430,6 +378,20 @@ func (q linkQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (bool,
 	return count > 0, nil
 }
 
+// LinkOriginal pointed to by the foreign key.
+func (o *Link) LinkOriginal(mods ...qm.QueryMod) linkOriginalQuery {
+	queryMods := []qm.QueryMod{
+		qm.Where("link_id=?", o.ID),
+	}
+
+	queryMods = append(queryMods, mods...)
+
+	query := LinkOriginals(queryMods...)
+	queries.SetFrom(query.Query, "`link_originals`")
+
+	return query
+}
+
 // LinksTags retrieves all the links_tag's LinksTags with an executor.
 func (o *Link) LinksTags(mods ...qm.QueryMod) linksTagQuery {
 	var queryMods []qm.QueryMod
@@ -449,6 +411,104 @@ func (o *Link) LinksTags(mods ...qm.QueryMod) linksTagQuery {
 	}
 
 	return query
+}
+
+// LoadLinkOriginal allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-1 relationship.
+func (linkL) LoadLinkOriginal(ctx context.Context, e boil.ContextExecutor, singular bool, maybeLink interface{}, mods queries.Applicator) error {
+	var slice []*Link
+	var object *Link
+
+	if singular {
+		object = maybeLink.(*Link)
+	} else {
+		slice = *maybeLink.(*[]*Link)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &linkR{}
+		}
+		args = append(args, object.ID)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &linkR{}
+			}
+
+			for _, a := range args {
+				if a == obj.ID {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.ID)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(qm.From(`link_originals`), qm.WhereIn(`link_id in ?`, args...))
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load LinkOriginal")
+	}
+
+	var resultSlice []*LinkOriginal
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice LinkOriginal")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results of eager load for link_originals")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for link_originals")
+	}
+
+	if len(linkAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+
+	if len(resultSlice) == 0 {
+		return nil
+	}
+
+	if singular {
+		foreign := resultSlice[0]
+		object.R.LinkOriginal = foreign
+		if foreign.R == nil {
+			foreign.R = &linkOriginalR{}
+		}
+		foreign.R.Link = object
+	}
+
+	for _, local := range slice {
+		for _, foreign := range resultSlice {
+			if local.ID == foreign.LinkID {
+				local.R.LinkOriginal = foreign
+				if foreign.R == nil {
+					foreign.R = &linkOriginalR{}
+				}
+				foreign.R.Link = local
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadLinksTags allows an eager lookup of values, cached into the
@@ -543,6 +603,57 @@ func (linkL) LoadLinksTags(ctx context.Context, e boil.ContextExecutor, singular
 		}
 	}
 
+	return nil
+}
+
+// SetLinkOriginal of the link to the related item.
+// Sets o.R.LinkOriginal to related.
+// Adds o to related.R.Link.
+func (o *Link) SetLinkOriginal(ctx context.Context, exec boil.ContextExecutor, insert bool, related *LinkOriginal) error {
+	var err error
+
+	if insert {
+		related.LinkID = o.ID
+
+		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
+			return errors.Wrap(err, "failed to insert into foreign table")
+		}
+	} else {
+		updateQuery := fmt.Sprintf(
+			"UPDATE `link_originals` SET %s WHERE %s",
+			strmangle.SetParamNames("`", "`", 0, []string{"link_id"}),
+			strmangle.WhereClause("`", "`", 0, linkOriginalPrimaryKeyColumns),
+		)
+		values := []interface{}{o.ID, related.ID}
+
+		if boil.DebugMode {
+			fmt.Fprintln(boil.DebugWriter, updateQuery)
+			fmt.Fprintln(boil.DebugWriter, values)
+		}
+
+		if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+			return errors.Wrap(err, "failed to update foreign table")
+		}
+
+		related.LinkID = o.ID
+
+	}
+
+	if o.R == nil {
+		o.R = &linkR{
+			LinkOriginal: related,
+		}
+	} else {
+		o.R.LinkOriginal = related
+	}
+
+	if related.R == nil {
+		related.R = &linkOriginalR{
+			Link: o,
+		}
+	} else {
+		related.R.Link = o
+	}
 	return nil
 }
 

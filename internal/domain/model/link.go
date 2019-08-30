@@ -5,12 +5,14 @@ import "errors"
 type Link struct {
 	id          int
 	url         string
+	title       string
 	description string
 	tags        []*Tag
 }
 
 type LinkInput struct {
 	URL         string
+	Title       string
 	Description string
 	Tags        []*Tag
 }
@@ -21,6 +23,7 @@ func NewLink(i LinkInput) (*Link, error) {
 	}
 	return &Link{
 		url:         i.URL,
+		title:       i.Title,
 		description: i.Description,
 		tags:        i.Tags,
 	}, nil
@@ -32,6 +35,10 @@ func (l *Link) GetID() int {
 
 func (l *Link) GetURL() string {
 	return l.url
+}
+
+func (l *Link) GetTitle() string {
+	return l.title
 }
 
 func (l *Link) GetDescription() string {
@@ -48,6 +55,10 @@ func (l *Link) SetID(id int) {
 
 func (l *Link) SetURL(url string) {
 	l.url = url
+}
+
+func (l *Link) SetTitle(title string) {
+	l.title = title
 }
 
 func (l *Link) SetDescription(d string) {

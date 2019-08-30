@@ -6,7 +6,7 @@ import { LinkPayload } from "../api/linksRepository";
 const linkRepository = repositoryFactory.get("links");
 
 interface Props {
-  afterSubmit: () => void;
+  afterSubmit: (id: number) => void;
 }
 
 export const AddLinkForm = (props: Props) => {
@@ -17,8 +17,8 @@ export const AddLinkForm = (props: Props) => {
         description: input.description,
         tags: input.tags
       })
-      .then(() => {
-        return;
+      .then(res => {
+        return res.id;
       })
       .catch(e => {
         return Promise.reject(e);

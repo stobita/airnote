@@ -21,8 +21,8 @@ export const EditLinkForm = (props: Props) => {
           description: input.description,
           tags: input.tags
         })
-        .then(() => {
-          return;
+        .then(res => {
+          return res.id;
         })
         .catch(e => {
           return Promise.reject(e);

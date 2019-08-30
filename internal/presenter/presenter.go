@@ -19,6 +19,7 @@ func New(w http.ResponseWriter) *presenter {
 type linkJSON struct {
 	ID          int       `json:"id"`
 	URL         string    `json:"url"`
+	Title       string    `json:"title"`
 	Description string    `json:"description"`
 	Tags        []tagJSON `json:"tags"`
 }
@@ -26,6 +27,10 @@ type linkJSON struct {
 type tagJSON struct {
 	ID   int    `json:"id"`
 	Text string `json:"text"`
+}
+
+type linkOriginalJSON struct {
+	Title string `json:"title"`
 }
 
 type listJSON struct {
@@ -54,6 +59,7 @@ func (p *presenter) ResponseLinks(o usecase.LinksOutputData) error {
 		j.Items = append(j.Items, &linkJSON{
 			ID:          v.ID,
 			URL:         v.URL,
+			Title:       v.Title,
 			Description: v.Description,
 			Tags:        tagListJSON,
 		})
@@ -71,8 +77,16 @@ func (p *presenter) ResponseLink(o usecase.LinkOutputData) error {
 	j := linkJSON{
 		ID:          o.ID,
 		URL:         o.URL,
+		Title:       o.Title,
 		Description: o.Description,
 		Tags:        tags,
+	}
+	return json.NewEncoder(p.writer).Encode(j)
+}
+
+func (p *presenter) ResponseLinkOriginal(o usecase.LinkOriginalOutputData) error {
+	j := linkOriginalJSON{
+		Title: o.Title,
 	}
 	return json.NewEncoder(p.writer).Encode(j)
 }

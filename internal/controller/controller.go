@@ -96,3 +96,16 @@ func (c *controller) DeleteLink() gin.HandlerFunc {
 		i.DeleteLink(id)
 	}
 }
+
+func (c *controller) GetLinkOriginal() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		o := c.outputPortFactory(ctx.Writer)
+		i := c.inputPortFactory(o)
+		id, err := strconv.Atoi(ctx.Param("id"))
+		if err != nil {
+			o.ResponseError(err)
+			return
+		}
+		i.GetLinkOriginal(id)
+	}
+}
