@@ -93,6 +93,7 @@ export const LinkForm = (props: Props) => {
           placeholder="Tag"
           value={formValue.tags ? formValue.tags : []}
           onChange={onChangeTag}
+          tags={props.tags}
         />
       </Field>
       <Field>
