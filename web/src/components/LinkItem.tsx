@@ -8,12 +8,21 @@ import { TagBadge } from "./TagBadge";
 interface Props {
   item: Link;
   onClick: (l: Link) => void;
+  onClickTag: (id: number) => void;
 }
 
 export const LinkItem = (props: Props) => {
   const handleOnClick = useCallback(() => {
     props.onClick(props.item);
   }, [props]);
+
+  const handleOnClickTag = (e: React.MouseEvent<HTMLElement>) => {
+    e.stopPropagation();
+    const id = e.currentTarget.dataset.id;
+    if (id) {
+      props.onClickTag(Number(id));
+    }
+  };
 
   return (
     <Wrapper onClick={handleOnClick}>
@@ -27,7 +36,9 @@ export const LinkItem = (props: Props) => {
         </p>
         <Tags>
           {props.item.tags.map(v => (
-            <TagBadge key={v.id}>{v.text}</TagBadge>
+            <TagBadge data-id={v.id} onClick={handleOnClickTag} key={v.id}>
+              {v.text}
+            </TagBadge>
           ))}
         </Tags>
       </Bottom>

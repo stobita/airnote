@@ -1,28 +1,28 @@
 import React, { useCallback, useState } from "react";
-import { Link } from "../model/link";
+import { Link, Tag } from "../model/link";
 import { ReactComponent as DefaultImage } from "../assets/default.svg";
 import { ReactComponent as EditIconImage } from "../assets/edit.svg";
 import { ReactComponent as DeleteIconImage } from "../assets/delete.svg";
 import styled, { css } from "styled-components";
 import colors from "../colors";
-import { repositoryFactory } from "../api/repositoryFactory";
 import { EditLinkForm } from "./EditLinkForm";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import { TagBadge } from "./TagBadge";
-
-const linkRepository = repositoryFactory.get("links");
+import linksRepository from "../api/linksRepository";
 
 interface Props {
   item: Link;
+  tags: Tag[];
   afterUpdate: () => void;
   afterDelete: () => void;
+  onClickTag: (id: number) => void;
 }
 
 export const LinkDetail = (props: Props) => {
   const [isEdit, setIsEdit] = useState();
   const [isDelete, setIsDelete] = useState();
   const handleDeleteLink = useCallback(() => {
-    linkRepository.deleteLink(props.item.id).then(() => {
+    linksRepository.deleteLink(props.item.id).then(() => {
       props.afterDelete();
     });
   }, [props]);
@@ -40,12 +40,20 @@ export const LinkDetail = (props: Props) => {
     setIsDelete(false);
   }, []);
 
+  const handleOnClickTag = (e: React.MouseEvent<HTMLElement>) => {
+    const id = e.currentTarget.dataset.id;
+    if (id) {
+      props.onClickTag(Number(id));
+    }
+  };
+
   const Container = () => {
     return isEdit ? (
       <EditLinkForm
         target={props.item}
         afterSubmit={props.afterUpdate}
         onCancel={handleEditCancel}
+        tags={props.tags}
       />
     ) : (
       <TextPreview />
@@ -74,7 +82,9 @@ export const LinkDetail = (props: Props) => {
         <p>{props.item.description}</p>
         <div>
           {props.item.tags.map(v => (
-            <TagBadge key={v.id}>{v.text}</TagBadge>
+            <TagBadge data-id={v.id} onClick={handleOnClickTag} key={v.id}>
+              {v.text}
+            </TagBadge>
           ))}
         </div>
       </>

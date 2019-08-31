@@ -1,17 +1,16 @@
 import React, { useCallback } from "react";
-import { repositoryFactory } from "../api/repositoryFactory";
 import { LinkForm } from "./LinkForm";
-import { LinkPayload } from "../api/linksRepository";
-
-const linkRepository = repositoryFactory.get("links");
+import linksRepository, { LinkPayload } from "../api/linksRepository";
+import { Tag } from "../model/link";
 
 interface Props {
+  tags: Tag[];
   afterSubmit: (id: number) => void;
 }
 
 export const AddLinkForm = (props: Props) => {
   const onSubmit = useCallback((input: LinkPayload) => {
-    return linkRepository
+    return linksRepository
       .createLink({
         url: input.url,
         description: input.description,
@@ -25,5 +24,11 @@ export const AddLinkForm = (props: Props) => {
       });
   }, []);
 
-  return <LinkForm onSubmit={onSubmit} afterSubmit={props.afterSubmit} />;
+  return (
+    <LinkForm
+      onSubmit={onSubmit}
+      afterSubmit={props.afterSubmit}
+      tags={props.tags}
+    />
+  );
 };
