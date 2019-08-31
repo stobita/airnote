@@ -25,6 +25,10 @@ const useTagInput = (value: string[], onChange: (item: string[]) => void) => {
     onChange(items);
   }, [items, inputValue, onChange]);
 
+  useEffect(() => {
+    setItems(value);
+  }, [value]);
+
   const addItem = () => {
     const value = inputValue.trim();
     if (items.find(v => v === value)) {
@@ -61,6 +65,7 @@ const useTagInput = (value: string[], onChange: (item: string[]) => void) => {
   const handleOnBlurInput = () => {
     addItem();
   };
+
   return {
     items,
     inputValue,
@@ -84,6 +89,7 @@ export const TagInput = (props: Props) => {
     handleOnKeyDown,
     handleOnClickClose
   } = useTagInput(props.value, props.onChange);
+
   return (
     <Wrapper>
       <List>

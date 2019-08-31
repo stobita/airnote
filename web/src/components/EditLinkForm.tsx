@@ -1,21 +1,19 @@
 import React, { useCallback } from "react";
-import { repositoryFactory } from "../api/repositoryFactory";
 import { LinkForm } from "./LinkForm";
-import { LinkPayload } from "../api/linksRepository";
-import { Link } from "../model/link";
-
-const linkRepository = repositoryFactory.get("links");
+import linksRepository, { LinkPayload } from "../api/linksRepository";
+import { Link, Tag } from "../model/link";
 
 interface Props {
   afterSubmit: () => void;
   onCancel: () => void;
   target: Link;
+  tags: Tag[];
 }
 
 export const EditLinkForm = (props: Props) => {
   const onSubmit = useCallback(
     (input: LinkPayload) => {
-      return linkRepository
+      return linksRepository
         .updateLink(props.target.id, {
           url: input.url,
           description: input.description,
@@ -43,6 +41,7 @@ export const EditLinkForm = (props: Props) => {
       onSubmit={onSubmit}
       afterSubmit={props.afterSubmit}
       onCancel={props.onCancel}
+      tags={props.tags}
     />
   );
 };

@@ -6,6 +6,7 @@ import styled from "styled-components";
 interface Props {
   items: Link[];
   onSelectItem: (l: Link) => void;
+  onClickTag: (id: number) => void;
 }
 
 export const LinkIndex = (props: Props) => {
@@ -20,7 +21,11 @@ export const LinkIndex = (props: Props) => {
     <Wrapper>
       {props.items.map(link => (
         <Column key={link.id}>
-          <LinkItem item={link} onClick={onClickItem} />
+          <LinkItem
+            item={link}
+            onClick={onClickItem}
+            onClickTag={props.onClickTag}
+          />
         </Column>
       ))}
     </Wrapper>

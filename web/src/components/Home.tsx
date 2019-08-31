@@ -1,24 +1,39 @@
 import React, { useState, useEffect, useCallback } from "react";
 import styled from "styled-components";
-import { Link } from "../model/link";
+import { Link, Tag } from "../model/link";
 import { Sidebar } from "./Sidebar";
 import { LinkIndex } from "./LinkIndex";
 import { Header } from "./Header";
 import { SlideMenu } from "./SlideMenu";
 import { AddLinkForm } from "./AddLinkForm";
-import { repositoryFactory } from "../api/repositoryFactory";
 import { LinkDetail } from "./LinkDetail";
-
-const linkRepository = repositoryFactory.get("links");
+import linksRepository from "../api/linksRepository";
+import tagsRepository from "../api/tagsRepository";
 
 export const Home = () => {
   const [links, setLinks] = useState<Link[]>([]);
+  const [tags, setTags] = useState<Tag[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedLink, setSelectedLink] = useState<Link>();
 
   useEffect(() => {
-    linkRepository.getAllLinks().then(links => {
+    linksRepository.getAllLinks().then(links => {
+      setLinks(links);
+    });
+    tagsRepository.getAllTags().then(tags => {
+      setTags(tags);
+    });
+  }, []);
+
+  const refreshLinks = useCallback(() => {
+    linksRepository.getAllLinks().then(links => {
+      setLinks(links);
+    });
+  }, []);
+
+  const onClickTag = useCallback(id => {
+    tagsRepository.getLinks(id).then(links => {
       setLinks(links);
     });
   }, []);
@@ -33,9 +48,9 @@ export const Home = () => {
   }, []);
 
   const handleAfterCreate = useCallback(async id => {
-    const links = await linkRepository.getAllLinks();
+    const links = await linksRepository.getAllLinks();
     setLinks(links);
-    const original = await linkRepository.getLinkOriginal(id);
+    const original = await linksRepository.getLinkOriginal(id);
     const newlinks = links.map(i =>
       i.id === id ? { ...i, title: original.title } : i
     );
@@ -44,7 +59,7 @@ export const Home = () => {
   }, []);
 
   const handleAfterUpdate = useCallback(() => {
-    linkRepository.getAllLinks().then(links => {
+    linksRepository.getAllLinks().then(links => {
       setLinks(links);
       if (selectedLink) {
         setSelectedLink(links.find(i => i.id === selectedLink.id));
@@ -53,7 +68,7 @@ export const Home = () => {
   }, [selectedLink]);
 
   const handleAfterDelete = useCallback(() => {
-    linkRepository.getAllLinks().then(links => {
+    linksRepository.getAllLinks().then(links => {
       setLinks(links);
       setDetailOpen(false);
     });
@@ -67,14 +82,16 @@ export const Home = () => {
   const SlideMenuContent = () => {
     switch (true) {
       case formOpen:
-        return <AddLinkForm afterSubmit={handleAfterCreate} />;
+        return <AddLinkForm afterSubmit={handleAfterCreate} tags={tags} />;
       case detailOpen:
         if (selectedLink) {
           return (
             <LinkDetail
               item={selectedLink}
+              tags={tags}
               afterUpdate={handleAfterUpdate}
               afterDelete={handleAfterDelete}
+              onClickTag={onClickTag}
             />
           );
         } else {
@@ -88,11 +105,19 @@ export const Home = () => {
   return (
     <Wrapper>
       <Left>
-        <Sidebar />
+        <Sidebar
+          tags={tags}
+          onClickTag={onClickTag}
+          onClickTitle={refreshLinks}
+        />
       </Left>
       <Right>
         <Header onClickAddButton={showForm} />
-        <LinkIndex items={links} onSelectItem={selectItem} />
+        <LinkIndex
+          items={links}
+          onSelectItem={selectItem}
+          onClickTag={onClickTag}
+        />
       </Right>
       <SlideMenu onClose={closeSlide} open={formOpen || detailOpen}>
         <SlideMenuContent />

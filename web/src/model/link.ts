@@ -10,7 +10,7 @@ export type LinkOriginal = {
   title: string;
 };
 
-type Tag = {
+export type Tag = {
   id: number;
   text: string;
 };

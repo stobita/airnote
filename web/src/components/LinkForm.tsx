@@ -7,9 +7,11 @@ import { ButtonPair } from "./ButtonPair";
 import { TagInput } from "./TagInput";
 import { Input } from "./Input";
 import { Textarea } from "./Textarea";
+import { Tag } from "../model/link";
 
 interface Props {
   initFormValue?: LinkPayload;
+  tags: Tag[];
   onSubmit: (p: LinkPayload) => Promise<number>;
   onCancel?: () => void;
   afterSubmit: (id: number) => void;
@@ -57,6 +59,14 @@ export const LinkForm = (props: Props) => {
     });
   }, [formValue, props]);
 
+  const onClickRecommendedTag = (e: React.MouseEvent<HTMLElement>) => {
+    const selectedText = e.currentTarget.dataset.text;
+    if (selectedText && !formValue.tags.some(v => v === selectedText)) {
+      const tags = [...formValue.tags, selectedText];
+      setFormValue(prev => ({ ...prev, tags: tags }));
+    }
+  };
+
   return (
     <>
       {formError && <ErrorMessage>{formError}</ErrorMessage>}
@@ -86,6 +96,18 @@ export const LinkForm = (props: Props) => {
         />
       </Field>
       <Field>
+        <FieldTitle>Recommended:</FieldTitle>
+        {props.tags.map(v => (
+          <UsedTag
+            key={v.id}
+            data-text={v.text}
+            onClick={onClickRecommendedTag}
+          >
+            #{v.text}
+          </UsedTag>
+        ))}
+      </Field>
+      <Field>
         {props.onCancel ? (
           <ButtonPair
             left={
@@ -113,4 +135,16 @@ const Field = styled.div`
 const ErrorMessage = styled.div`
   padding: 16px 0;
   color: ${colors.danger};
+`;
+
+const FieldTitle = styled.span`
+  color: ${colors.mainWhite};
+  margin-right: 8px;
+  font-weight: bold;
+`;
+
+const UsedTag = styled.span`
+  color: ${colors.mainWhite};
+  margin-right: 8px;
+  cursor: pointer;
 `;
