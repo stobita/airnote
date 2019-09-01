@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
 import colors from "../colors";
 
@@ -9,11 +9,6 @@ interface Props {
   onMouseEnterItem: (id: number) => void;
   hoverIndex: number;
 }
-
-type Item = {
-  id: number;
-  label: string;
-};
 
 export const AutoSuggest = (props: Props) => {
   if (props.items.length < 1) return null;
@@ -51,14 +46,57 @@ export const AutoSuggest = (props: Props) => {
   );
 };
 
+export const useSuggest = (items: string[], inputValue: string) => {
+  const [selectedSuggestion, setSelectedSuggestion] = useState("");
+  const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(0);
+
+  const suggestions = items.filter(
+    v =>
+      inputValue.length > 0 &&
+      v.toLowerCase().startsWith(inputValue.toLowerCase())
+  );
+
+  useEffect(() => {
+    setSelectedSuggestion(suggestions[selectedSuggestionIndex]);
+  }, [selectedSuggestionIndex, suggestions]);
+
+  const suggestUp = () => {
+    if (selectedSuggestionIndex < 1) {
+      setSelectedSuggestionIndex(suggestions.length - 1);
+    } else {
+      setSelectedSuggestionIndex(prev => --prev);
+    }
+  };
+  const suggestDown = () => {
+    if (selectedSuggestionIndex > suggestions.length - 2) {
+      setSelectedSuggestionIndex(0);
+    } else {
+      setSelectedSuggestionIndex(prev => ++prev);
+    }
+  };
+
+  return {
+    suggestions,
+    selectedSuggestion,
+    setSelectedSuggestion,
+    selectedSuggestionIndex,
+    setSelectedSuggestionIndex,
+    suggestUp,
+    suggestDown
+  };
+};
+
 const Wrapper = styled.div`
   background: ${colors.mainWhite};
+  margin-top: -4px;
 `;
 
 const Hovered = css`
-  background: ${colors.danger};
+  background: ${colors.primaryPale};
 `;
 
 const Item = styled.li<{ isSelect: boolean }>`
   ${props => props.isSelect && Hovered}
+  padding: 8px;
+  color: ${colors.mainGray};
 `;

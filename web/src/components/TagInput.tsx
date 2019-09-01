@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
 import colors from "../colors";
 import { FieldItemBase } from "./FieldItemBase";
-import { AutoSuggest } from "./AutoSuggest";
+import { AutoSuggest, useSuggest } from "./AutoSuggest";
 import { Tag } from "../model/link";
 
 interface Props {
@@ -12,6 +12,154 @@ interface Props {
   tags: Tag[];
   onChange: (items: string[]) => void;
 }
+
+export const TagInput = (props: Props) => {
+  const {
+    items,
+    inputValue,
+    inputError,
+    willRemove,
+    handleOnBlurInput,
+    handleOnChangeInput,
+    handleOnKeyDown,
+    handleOnClickClose,
+    selectedSuggestionIndex,
+    suggestions,
+    handleOnClickSuggest,
+    handleOnMouseEnterSuggest,
+    handleOnClickRecommentded
+  } = useTagInput(props.value, props.onChange, props.tags);
+
+  return (
+    <Wrapper>
+      <InputArea hasTag={items.length > 0}>
+        {items.map((item, index) => (
+          <Item
+            key={item}
+            willRemove={willRemove && index === items.length - 1}
+          >
+            <span>{item}</span>
+            <Close data-item={item} onClick={handleOnClickClose}>
+              ×
+            </Close>
+          </Item>
+        ))}
+        <Input
+          error={inputError}
+          name={props.name}
+          value={inputValue}
+          placeholder={props.placeholder}
+          onChange={handleOnChangeInput}
+          onKeyDown={handleOnKeyDown}
+          onBlur={handleOnBlurInput}
+          hasTag={items.length > 0}
+        />
+      </InputArea>
+      <AutoSuggest
+        items={suggestions}
+        inputValue={inputValue}
+        onMouseEnterItem={handleOnMouseEnterSuggest}
+        hoverIndex={selectedSuggestionIndex}
+        onClickItem={handleOnClickSuggest}
+      ></AutoSuggest>
+      <Recommended>
+        <FieldTitle>Recommended:</FieldTitle>
+        {props.tags
+          .filter(v => !items.includes(v.text))
+          .slice(0, 5)
+          .map(v => (
+            <UsedTag
+              key={v.id}
+              data-text={v.text}
+              onClick={handleOnClickRecommentded}
+            >
+              #{v.text}
+            </UsedTag>
+          ))}
+      </Recommended>
+    </Wrapper>
+  );
+};
+
+const Wrapper = styled.div`
+  width: 100%;
+`;
+
+const InputArea = styled.div<{ hasTag: boolean }>`
+  ${FieldItemBase}
+  height: auto;
+  min-height: 36px;
+  display: flex;
+  flex-wrap: wrap;
+  background: ${colors.mainWhite};
+  padding: 4px 8px;
+  ${props =>
+    props.hasTag &&
+    css`
+      padding-bottom: 0px;
+    `}
+`;
+
+const Input = styled.input<{ hasTag: boolean; error: boolean }>`
+  ${FieldItemBase}
+  padding:4px 0;
+  margin: 0;
+  height: auto;
+  width: 50%;
+  ${props =>
+    props.error &&
+    css`
+      color: ${colors.danger};
+    `}
+  ${props =>
+    props.hasTag &&
+    css`
+      margin-bottom: 4px;
+    `}
+`;
+
+const Item = styled.li<{ willRemove: boolean }>`
+  position: relative;
+  color: ${colors.mainGray};
+  border: 1px solid ${colors.mainGray};
+  border-radius: 4px;
+  margin-right: 4px;
+  margin-bottom: 4px;
+  box-sizing: border-box;
+  padding: 4px 20px 4px 4px;
+  ${props =>
+    props.willRemove &&
+    css`
+      background: ${colors.thinGray};
+      color: ${colors.mainWhite};
+      border: 1px solid ${colors.thinGray};
+    `}
+`;
+
+const Close = styled.span`
+  position: absolute;
+  cursor: pointer;
+  top: 3px;
+  right: 5px;
+`;
+
+const FieldTitle = styled.span`
+  color: ${colors.mainWhite};
+  margin-right: 8px;
+  font-weight: bold;
+`;
+
+const UsedTag = styled.span`
+  color: ${colors.mainWhite};
+  margin-right: 8px;
+  cursor: pointer;
+`;
+
+const Recommended = styled.div`
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+`;
 
 const useTagInput = (
   value: string[],
@@ -23,8 +171,16 @@ const useTagInput = (
   const [inputError, setInputError] = useState(false);
   const [willRemove, setWillRemove] = useState(false);
 
-  const [selectSuggestion, setSelectSuggestion] = useState("");
-  const [selectSuggestionIndex, setSelectSuggestionIndex] = useState(0);
+  const suggestionBase = tags.map(v => v.text).filter(v => !items.includes(v));
+
+  const {
+    suggestions,
+    selectedSuggestion,
+    selectedSuggestionIndex,
+    setSelectedSuggestionIndex,
+    suggestUp,
+    suggestDown
+  } = useSuggest(suggestionBase, inputValue);
 
   useEffect(() => {
     setInputError(false);
@@ -38,18 +194,6 @@ const useTagInput = (
   useEffect(() => {
     setItems(value);
   }, [value]);
-
-  const suggestions = tags
-    .filter(
-      v =>
-        inputValue.length > 0 &&
-        v.text.toLowerCase().startsWith(inputValue.toLowerCase())
-    )
-    .map(v => v.text);
-
-  useEffect(() => {
-    setSelectSuggestion(suggestions[selectSuggestionIndex]);
-  }, [selectSuggestionIndex, suggestions]);
 
   const addItemFromInput = () => {
     const value = inputValue.trim();
@@ -82,8 +226,8 @@ const useTagInput = (
 
   const handleOnKeyDown = (e: React.KeyboardEvent) => {
     if (e.keyCode === 13) {
-      if (selectSuggestion) {
-        addItem(selectSuggestion);
+      if (selectedSuggestion) {
+        addItem(selectedSuggestion);
       } else {
         addItemFromInput();
       }
@@ -94,17 +238,9 @@ const useTagInput = (
         setWillRemove(true);
       }
     } else if (e.keyCode === 38) {
-      if (selectSuggestionIndex < 1) {
-        setSelectSuggestionIndex(suggestions.length - 1);
-      } else {
-        setSelectSuggestionIndex(prev => --prev);
-      }
+      suggestUp();
     } else if (e.keyCode === 40) {
-      if (selectSuggestionIndex > suggestions.length - 2) {
-        setSelectSuggestionIndex(0);
-      } else {
-        setSelectSuggestionIndex(prev => ++prev);
-      }
+      suggestDown();
     }
   };
 
@@ -119,7 +255,14 @@ const useTagInput = (
   };
 
   const handleOnMouseEnterSuggest = (idx: number) => {
-    setSelectSuggestionIndex(idx);
+    setSelectedSuggestionIndex(idx);
+  };
+
+  const handleOnClickRecommentded = (e: React.MouseEvent<HTMLElement>) => {
+    const selectedText = e.currentTarget.dataset.text;
+    if (selectedText) {
+      addItem(selectedText);
+    }
   };
 
   return {
@@ -131,114 +274,10 @@ const useTagInput = (
     handleOnBlurInput,
     handleOnChangeInput,
     handleOnKeyDown,
-    setSelectSuggestionIndex,
-    selectSuggestionIndex,
+    selectedSuggestionIndex,
     suggestions,
     handleOnClickSuggest,
-    handleOnMouseEnterSuggest
+    handleOnMouseEnterSuggest,
+    handleOnClickRecommentded
   };
 };
-
-export const TagInput = (props: Props) => {
-  const {
-    items,
-    inputValue,
-    inputError,
-    willRemove,
-    handleOnBlurInput,
-    handleOnChangeInput,
-    handleOnKeyDown,
-    handleOnClickClose,
-    selectSuggestionIndex,
-    suggestions,
-    handleOnClickSuggest,
-    handleOnMouseEnterSuggest
-  } = useTagInput(props.value, props.onChange, props.tags);
-
-  return (
-    <Wrapper>
-      <InputArea>
-        <List>
-          {items.map((item, index) => (
-            <Item
-              key={item}
-              willRemove={willRemove && index === items.length - 1}
-            >
-              <span>{item}</span>
-              <Close data-item={item} onClick={handleOnClickClose}>
-                ×
-              </Close>
-            </Item>
-          ))}
-        </List>
-        <Input
-          error={inputError}
-          name={props.name}
-          value={inputValue}
-          placeholder={props.placeholder}
-          onChange={handleOnChangeInput}
-          onKeyDown={handleOnKeyDown}
-          onBlur={handleOnBlurInput}
-        />
-      </InputArea>
-      <AutoSuggest
-        items={suggestions}
-        inputValue={inputValue}
-        onMouseEnterItem={handleOnMouseEnterSuggest}
-        hoverIndex={selectSuggestionIndex}
-        onClickItem={handleOnClickSuggest}
-      ></AutoSuggest>
-    </Wrapper>
-  );
-};
-
-const Wrapper = styled.div`
-  width: 100%;
-`;
-
-const InputArea = styled.label`
-  ${FieldItemBase}
-  display: flex;
-  background: ${colors.mainWhite};
-  padding: 4px 8px;
-`;
-
-const Input = styled.input<{ error: boolean }>`
-  ${FieldItemBase}
-  padding:4px 0;
-  margin: 0;
-  height: auto;
-  ${props =>
-    props.error &&
-    css`
-      color: ${colors.danger};
-    `}
-`;
-
-const List = styled.ul`
-  display: flex;
-`;
-
-const Item = styled.li<{ willRemove: boolean }>`
-  position: relative;
-  color: ${colors.mainGray};
-  border: 1px solid ${colors.mainGray};
-  border-radius: 4px;
-  margin-right: 4px;
-  box-sizing: border-box;
-  padding: 4px 20px 4px 4px;
-  ${props =>
-    props.willRemove &&
-    css`
-      background: ${colors.thinGray};
-      color: ${colors.mainWhite};
-      border: 1px solid ${colors.thinGray};
-    `}
-`;
-
-const Close = styled.span`
-  position: absolute;
-  cursor: pointer;
-  top: 3px;
-  right: 5px;
-`;
