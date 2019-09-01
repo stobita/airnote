@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import colors from "../colors";
 import { Tag } from "../model/link";
 
 interface Props {
@@ -31,13 +30,15 @@ export const Sidebar = (props: Props) => {
 };
 
 const Wrapper = styled.div`
+  background: ${props => props.theme.bg};
+  color: ${props => props.theme.text};
+  border-right: 1px solid ${props => props.theme.border};
   display: flex;
-  background: ${colors.mainBlack};
-  color: ${colors.mainWhite};
   flex-direction: column;
   min-height: 100vh;
   height: 100%;
   padding: 24px;
+  box-sizing: border-box;
 `;
 
 const Title = styled.h2`

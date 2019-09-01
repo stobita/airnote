@@ -1,5 +1,4 @@
 import React from "react";
-import colors from "../colors";
 import styled from "styled-components";
 
 interface Props {
@@ -16,8 +15,7 @@ export const AddButton = (props: Props) => {
 };
 
 const Button = styled.button`
-  background: ${colors.mainWhite};
-  border: 1px solid ${colors.borderGray};
+  border: 1px solid ${props => props.theme.border};
   height: 64px;
   width: 64px;
   border-radius: 32px;
@@ -31,7 +29,7 @@ const ButtonInner = styled.span`
   position: absolute;
   width: 50%;
   height: 2px;
-  background: ${colors.mainGray};
+  background: ${props => props.theme.text};
   border-radius: 4px;
   &:nth-of-type(1) {
     transform: rotate(90deg);

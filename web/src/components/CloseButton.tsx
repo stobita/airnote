@@ -1,5 +1,4 @@
 import React from "react";
-import colors from "../colors";
 import styled from "styled-components";
 
 interface Props {
@@ -25,10 +24,10 @@ const Button = styled.button`
 `;
 
 const ButtonInner = styled.span`
+  background: ${props => props.theme.text};
   position: absolute;
   width: 50%;
   height: 2px;
-  background: ${colors.mainWhite};
   border-radius: 4px;
   &:nth-of-type(1) {
     transform: rotate(45deg);

@@ -62,21 +62,23 @@ export const TagInput = (props: Props) => {
         hoverIndex={selectedSuggestionIndex}
         onClickItem={handleOnClickSuggest}
       ></AutoSuggest>
-      <Recommended>
-        <FieldTitle>Recommended:</FieldTitle>
-        {props.tags
-          .filter(v => !items.includes(v.text))
-          .slice(0, 5)
-          .map(v => (
-            <UsedTag
-              key={v.id}
-              data-text={v.text}
-              onClick={handleOnClickRecommentded}
-            >
-              #{v.text}
-            </UsedTag>
-          ))}
-      </Recommended>
+      {props.tags.length > 0 && (
+        <Recommended>
+          <RecommendedTitle>Recommended:</RecommendedTitle>
+          {props.tags
+            .filter(v => !items.includes(v.text))
+            .slice(0, 5)
+            .map(v => (
+              <RecommendItem
+                key={v.id}
+                data-text={v.text}
+                onClick={handleOnClickRecommentded}
+              >
+                #{v.text}
+              </RecommendItem>
+            ))}
+        </Recommended>
+      )}
     </Wrapper>
   );
 };
@@ -87,6 +89,7 @@ const Wrapper = styled.div`
 
 const InputArea = styled.div<{ hasTag: boolean }>`
   ${FieldItemBase}
+  border: 1px solid ${props => props.theme.border};
   height: auto;
   min-height: 36px;
   display: flex;
@@ -101,8 +104,8 @@ const InputArea = styled.div<{ hasTag: boolean }>`
 `;
 
 const Input = styled.input<{ hasTag: boolean; error: boolean }>`
-  ${FieldItemBase}
-  padding:4px 0;
+  ${FieldItemBase};
+  padding: 4px 0;
   margin: 0;
   height: auto;
   width: 50%;
@@ -143,22 +146,21 @@ const Close = styled.span`
   right: 5px;
 `;
 
-const FieldTitle = styled.span`
-  color: ${colors.mainWhite};
-  margin-right: 8px;
-  font-weight: bold;
-`;
-
-const UsedTag = styled.span`
-  color: ${colors.mainWhite};
+const RecommendItem = styled.span`
   margin-right: 8px;
   cursor: pointer;
 `;
 
 const Recommended = styled.div`
+  color: ${props => props.theme.text};
   margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
+`;
+
+const RecommendedTitle = styled.span`
+  margin-right: 8px;
+  font-weight: bold;
 `;
 
 const useTagInput = (

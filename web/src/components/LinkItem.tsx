@@ -24,16 +24,21 @@ export const LinkItem = (props: Props) => {
     }
   };
 
+  const { description } = props.item;
+
+  const displayDescription =
+    description.length > 30
+      ? `${description.slice(0, 30)}...`
+      : description.length > 0
+      ? description
+      : "no description";
+
   return (
     <Wrapper onClick={handleOnClick}>
-      <DefaultImage />
+      <Default />
       <Bottom>
         <Title>{props.item.title && props.item.title}</Title>
-        <p>
-          {props.item.description === ""
-            ? "no description"
-            : props.item.description}
-        </p>
+        <Description>{displayDescription}</Description>
         <Tags>
           {props.item.tags.map(v => (
             <TagBadge data-id={v.id} onClick={handleOnClickTag} key={v.id}>
@@ -47,12 +52,16 @@ export const LinkItem = (props: Props) => {
 };
 
 const Wrapper = styled.div`
-  flex: 0 1 25%;
   border: 1px solid ${colors.borderGray};
   border-radius: 4px;
   box-sizing: border-box;
   margin: 8px;
   cursor: pointer;
+  overflow: hidden;
+`;
+
+const Description = styled.p`
+  word-break: break-word;
 `;
 
 const Bottom = styled.div`
@@ -65,4 +74,8 @@ const Tags = styled.div`
 
 const Title = styled.p`
   font-weight: bold;
+`;
+
+const Default = styled(DefaultImage)`
+  height: auto;
 `;
