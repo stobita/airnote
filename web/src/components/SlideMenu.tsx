@@ -2,7 +2,6 @@ import React, { ReactNode } from "react";
 import styled from "styled-components";
 import { Transition } from "react-transition-group";
 import { TransitionStatus } from "react-transition-group/Transition";
-import colors from "../colors";
 import { CloseButton } from "./CloseButton";
 
 interface Props {
@@ -33,14 +32,19 @@ export const SlideMenu = (props: Props) => {
 const Head = styled.div`
   display: flex;
   justify-content: flex-end;
+  margin-bottom: 8px;
 `;
 
 const slideWidth = 500;
 
 const Inner = styled.div<{ state: TransitionStatus }>`
+  background: ${props => props.theme.bg};
+  color: ${props => props.theme.text};
+  border-left: 1px solid ${props => props.theme.border};
   padding: 16px 24px;
   box-sizing: border-box;
   position: fixed;
+  overflow-y: auto;
   right: -${slideWidth}px;
   transition: 0.5s;
   width: ${slideWidth}px;
@@ -49,5 +53,4 @@ const Inner = styled.div<{ state: TransitionStatus }>`
   );
   min-height: 100vh;
   height: 100%;
-  background: ${colors.mainBlack};
 `;

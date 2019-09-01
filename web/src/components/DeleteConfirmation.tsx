@@ -26,7 +26,7 @@ export const DeleteConfirmation = (props: Props) => {
 };
 
 const Wrapper = styled.div`
-  background: ${colors.mainWhite};
+  border: 1px solid ${props => props.theme.border};
   border-radius: 4px;
   padding: 16px;
   margin: 16px 0;

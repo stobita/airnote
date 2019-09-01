@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import styled from "styled-components";
+import styled, { ThemeProvider } from "styled-components";
 import { Link, Tag } from "../model/link";
 import { Sidebar } from "./Sidebar";
 import { LinkIndex } from "./LinkIndex";
@@ -9,6 +9,7 @@ import { AddLinkForm } from "./AddLinkForm";
 import { LinkDetail } from "./LinkDetail";
 import linksRepository from "../api/linksRepository";
 import tagsRepository from "../api/tagsRepository";
+import colors from "../colors";
 
 export const Home = () => {
   const [links, setLinks] = useState<Link[]>([]);
@@ -102,27 +103,37 @@ export const Home = () => {
     }
   };
 
+  // TODO: theme switch
+  const lightTheme = {
+    primary: colors.primary,
+    bg: colors.mainWhite,
+    text: colors.mainBlack,
+    border: colors.borderGray
+  };
+
   return (
-    <Wrapper>
-      <Left>
-        <Sidebar
-          tags={tags}
-          onClickTag={onClickTag}
-          onClickTitle={refreshLinks}
-        />
-      </Left>
-      <Right>
-        <Header onClickAddButton={showForm} />
-        <LinkIndex
-          items={links}
-          onSelectItem={selectItem}
-          onClickTag={onClickTag}
-        />
-      </Right>
-      <SlideMenu onClose={closeSlide} open={formOpen || detailOpen}>
-        <SlideMenuContent />
-      </SlideMenu>
-    </Wrapper>
+    <ThemeProvider theme={lightTheme}>
+      <Wrapper>
+        <Left>
+          <Sidebar
+            tags={tags}
+            onClickTag={onClickTag}
+            onClickTitle={refreshLinks}
+          />
+        </Left>
+        <Right>
+          <Header onClickAddButton={showForm} />
+          <LinkIndex
+            items={links}
+            onSelectItem={selectItem}
+            onClickTag={onClickTag}
+          />
+        </Right>
+        <SlideMenu onClose={closeSlide} open={formOpen || detailOpen}>
+          <SlideMenuContent />
+        </SlideMenu>
+      </Wrapper>
+    </ThemeProvider>
   );
 };
 

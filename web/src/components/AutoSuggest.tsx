@@ -87,6 +87,7 @@ export const useSuggest = (items: string[], inputValue: string) => {
 };
 
 const Wrapper = styled.div`
+  border: 1px solid ${props => props.theme.border};
   background: ${colors.mainWhite};
   margin-top: -4px;
 `;

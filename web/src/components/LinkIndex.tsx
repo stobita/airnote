@@ -39,6 +39,8 @@ const Wrapper = styled.div`
 `;
 
 const Column = styled.div`
+  display: flex;
   flex: 0 1 20%;
+  max-width: 20%;
   box-sizing: border-box;
 `;
