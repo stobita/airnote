@@ -17,6 +17,7 @@ export const Home = () => {
   const [formOpen, setFormOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedLink, setSelectedLink] = useState<Link>();
+  const [isPanel, setIsPanel] = useState(false);
 
   useEffect(() => {
     linksRepository.getAllLinks().then(links => {
@@ -111,6 +112,10 @@ export const Home = () => {
     border: colors.borderGray
   };
 
+  const togglePanelView = () => {
+    setIsPanel(prev => !prev);
+  };
+
   return (
     <ThemeProvider theme={lightTheme}>
       <Wrapper>
@@ -119,6 +124,8 @@ export const Home = () => {
             tags={tags}
             onClickTag={onClickTag}
             onClickTitle={refreshLinks}
+            isPanelView={isPanel}
+            setIsPanelView={togglePanelView}
           />
         </Left>
         <Right>
@@ -127,6 +134,7 @@ export const Home = () => {
             items={links}
             onSelectItem={selectItem}
             onClickTag={onClickTag}
+            isPanelView={isPanel}
           />
         </Right>
         <SlideMenu onClose={closeSlide} open={formOpen || detailOpen}>
@@ -146,7 +154,7 @@ const Left = styled.div`
 `;
 
 const Right = styled.div`
-  flex: 5;
+  flex: 4;
 `;
 
 export default Home;
