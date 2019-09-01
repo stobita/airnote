@@ -1,6 +1,11 @@
 package model
 
-import "errors"
+import (
+	"fmt"
+	"net/url"
+
+	"github.com/pkg/errors"
+)
 
 type Link struct {
 	id          int
@@ -21,6 +26,11 @@ func NewLink(i LinkInput) (*Link, error) {
 	if i.URL == "" {
 		return nil, errors.New("URL must set")
 	}
+	_, err := url.ParseRequestURI(i.URL)
+	if err != nil {
+		return nil, errors.Wrap(err, fmt.Sprintf("Invalid url: %s", i.URL))
+	}
+
 	return &Link{
 		url:         i.URL,
 		title:       i.Title,
