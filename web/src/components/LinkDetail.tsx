@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from "react";
 import { Link, Tag } from "../model/link";
 import { ReactComponent as DefaultImage } from "../assets/default.svg";
-import styled, { css } from "styled-components";
+import styled from "styled-components";
 import { EditLinkForm } from "./EditLinkForm";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import linksRepository from "../api/linksRepository";

@@ -1,8 +1,10 @@
 import React from "react";
 import { Link } from "../model/link";
+import { ReactComponent as DefaultImage } from "../assets/default.svg";
 import styled from "styled-components";
 import colors from "../colors";
 import { TagBadge } from "./TagBadge";
+import { useLinkItem } from "./LinkItem";
 
 interface Props {
   item: Link;
@@ -10,16 +12,17 @@ interface Props {
   onClickTag: (id: number) => void;
 }
 
-export const LinkItem = (props: Props) => {
+export const LinkItemPanel = (props: Props) => {
   const {
     item,
     handleOnClick,
     displayDescription,
     handleOnClickTag
-  } = useLinkItem(props.item, false, props.onClick, props.onClickTag);
+  } = useLinkItem(props.item, true, props.onClick, props.onClickTag);
 
   return (
     <Wrapper onClick={handleOnClick}>
+      <Default />
       <Bottom>
         <Title>{item.title && item.title}</Title>
         <Description>{displayDescription}</Description>
@@ -35,36 +38,6 @@ export const LinkItem = (props: Props) => {
   );
 };
 
-export const useLinkItem = (
-  item: Link,
-  isBlock: boolean,
-  onClick: (l: Link) => void,
-  onClickTag: (id: number) => void
-) => {
-  const handleOnClick = () => {
-    onClick(item);
-  };
-
-  const handleOnClickTag = (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    const id = e.currentTarget.dataset.id;
-    if (id) {
-      onClickTag(Number(id));
-    }
-  };
-
-  const { description } = item;
-  const displayDescriptionLength = isBlock ? 30 : 60;
-
-  const displayDescription =
-    description.length > displayDescriptionLength - 1
-      ? `${description.slice(0, displayDescriptionLength)}...`
-      : description.length > 0
-      ? description
-      : "no description";
-  return { item, handleOnClick, displayDescription, handleOnClickTag };
-};
-
 const Wrapper = styled.div`
   border: 1px solid ${colors.borderGray};
   border-radius: 4px;
@@ -72,7 +45,6 @@ const Wrapper = styled.div`
   margin: 8px;
   cursor: pointer;
   overflow: hidden;
-  width: 100%;
 `;
 
 const Description = styled.p`
@@ -89,4 +61,8 @@ const Tags = styled.div`
 
 const Title = styled.p`
   font-weight: bold;
+`;
+
+const Default = styled(DefaultImage)`
+  height: auto;
 `;

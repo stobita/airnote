@@ -94,7 +94,7 @@ const InputArea = styled.div<{ hasTag: boolean }>`
   min-height: 36px;
   display: flex;
   flex-wrap: wrap;
-  background: ${colors.mainWhite};
+  background: ${colors.white};
   padding: 4px 8px;
   ${props =>
     props.hasTag &&
