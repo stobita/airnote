@@ -8,7 +8,7 @@ import (
 	"github.com/stobita/airnote/internal/usecase"
 )
 
-type controller struct {
+type Controller struct {
 	inputPortFactory
 	outputPortFactory
 }
@@ -30,14 +30,14 @@ type inputPortFactory func(o usecase.OutputPort) usecase.InputPort
 type outputPortFactory func(w http.ResponseWriter) usecase.OutputPort
 
 // New create controller
-func New(i inputPortFactory, o outputPortFactory) *controller {
-	return &controller{
+func New(i inputPortFactory, o outputPortFactory) *Controller {
+	return &Controller{
 		i,
 		o,
 	}
 }
 
-func (c *controller) GetLinks() gin.HandlerFunc {
+func (c *Controller) GetLinks() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
@@ -45,7 +45,7 @@ func (c *controller) GetLinks() gin.HandlerFunc {
 	}
 }
 
-func (c *controller) PostLink() gin.HandlerFunc {
+func (c *Controller) PostLink() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
@@ -62,7 +62,7 @@ func (c *controller) PostLink() gin.HandlerFunc {
 	}
 }
 
-func (c *controller) UpdateLink() gin.HandlerFunc {
+func (c *Controller) UpdateLink() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
@@ -84,7 +84,7 @@ func (c *controller) UpdateLink() gin.HandlerFunc {
 	}
 }
 
-func (c *controller) DeleteLink() gin.HandlerFunc {
+func (c *Controller) DeleteLink() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
@@ -97,7 +97,7 @@ func (c *controller) DeleteLink() gin.HandlerFunc {
 	}
 }
 
-func (c *controller) GetLinkOriginal() gin.HandlerFunc {
+func (c *Controller) GetLinkOriginal() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
@@ -110,7 +110,7 @@ func (c *controller) GetLinkOriginal() gin.HandlerFunc {
 	}
 }
 
-func (c *controller) GetTags() gin.HandlerFunc {
+func (c *Controller) GetTags() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
@@ -119,7 +119,7 @@ func (c *controller) GetTags() gin.HandlerFunc {
 	}
 }
 
-func (c *controller) GetTagLinks() gin.HandlerFunc {
+func (c *Controller) GetTagLinks() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)

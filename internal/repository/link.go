@@ -60,6 +60,7 @@ func (r *repository) GetLink(id int) (*model.Link, error) {
 		tag.SetID(v.R.Tag.ID)
 		tags = append(tags, tag)
 	}
+	m.SetTags(tags)
 	return m, nil
 }
 
@@ -139,7 +140,6 @@ func (r *repository) SaveLink(input *model.Link) error {
 		return errors.Wrap(err, "Link.Insert error")
 	}
 	input.SetID(link.ID)
-
 	if len(input.GetTags()) == 0 {
 		return nil
 	}
@@ -154,7 +154,9 @@ func (r *repository) SaveLink(input *model.Link) error {
 	if err := link.AddLinksTags(ctx, r.db, true, rels...); err != nil {
 		return errors.Wrap(err, "link.AddLinksTags error")
 	}
-
+	if err := r.SaveLinkDocument(input); err != nil {
+		return errors.Wrap(err, "SaveLinkDocument error")
+	}
 	return nil
 }
 
@@ -208,6 +210,26 @@ func (r *repository) UpdateLink(input *model.Link) error {
 		return err
 	}
 
+	dbLinkOriginal, err := rdb.LinkOriginals(rdb.LinkOriginalWhere.LinkID.EQ(input.GetID())).One(ctx, r.db)
+	if err == sql.ErrNoRows {
+		origin := rdb.LinkOriginal{
+			LinkID: input.GetID(),
+			Title:  null.StringFrom(input.GetTitle()),
+		}
+		if err := origin.Insert(ctx, r.db, boil.Whitelist("link_id", "title")); err != nil {
+			return errors.Wrap(err, "Insert error")
+		}
+
+	} else if err == nil {
+		dbLinkOriginal.Title = null.StringFrom(input.GetTitle())
+		if _, err := dbLinkOriginal.Update(ctx, r.db, boil.Whitelist("title")); err != nil {
+			return err
+		}
+	} else {
+		return err
+	}
+
+	// NOTE: move usecase?
 	var beforeTagText []string
 	for _, v := range dbLink.R.LinksTags {
 		beforeTagText = append(beforeTagText, v.R.Tag.Text)
@@ -236,22 +258,29 @@ func (r *repository) UpdateLink(input *model.Link) error {
 			}
 		}
 	}
-
 	// tag add
-	rels := []*rdb.LinksTag{}
-	for _, v := range addTagIDs {
-		i := &rdb.LinksTag{
-			TagID: v.(int),
+	if len(addTagIDs) > 0 {
+		rels := []*rdb.LinksTag{}
+		for _, v := range addTagIDs {
+			i := &rdb.LinksTag{
+				TagID: v.(int),
+			}
+			rels = append(rels, i)
 		}
-		rels = append(rels, i)
-	}
-	if err := dbLink.AddLinksTags(ctx, r.db, true, rels...); err != nil {
-		return err
+		if err := dbLink.AddLinksTags(ctx, r.db, true, rels...); err != nil {
+			return err
+		}
 	}
 
 	// remove tag
-	if _, err := dbLink.LinksTags(qm.WhereIn("tag_id in ?", removeTagIDs...)).DeleteAll(ctx, r.db); err != nil {
-		return err
+	if len(removeTagIDs) > 0 {
+		if _, err := dbLink.LinksTags(qm.WhereIn("tag_id in ?", removeTagIDs...)).DeleteAll(ctx, r.db); err != nil {
+			return err
+		}
+	}
+
+	if err := r.UpdateLinkDocument(input); err != nil {
+		return errors.Wrap(err, "UpdateLinkDocument error")
 	}
 
 	return nil
@@ -280,6 +309,9 @@ func (r *repository) DeleteLink(model *model.Link) error {
 	}
 	if _, err := link.Delete(ctx, r.db); err != nil {
 		return err
+	}
+	if err := r.DeleteLinkDocument(model); err != nil {
+		return errors.Wrap(err, "DeleteLinkDocument error")
 	}
 	model = nil
 	return nil
