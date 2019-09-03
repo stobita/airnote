@@ -12,6 +12,7 @@ services:
       - ../../:/airnote
     depends_on:
       - db
+      - elasticsearch
       # - redis
     environment:
       MYSQL_DBNAME: airnote
@@ -21,8 +22,9 @@ services:
       MYSQL_PORT: 3306
       MYSQL_SKIPSQLCMD: "true"
       MYSQL_SSLMODE: "false"
-      REDIS_HOST: redis
-      REDIS_PORT: 6379
+      # REDIS_HOST: redis
+      # REDIS_PORT: 6379
+      ES_URL: "http://elasticsearch:9200"
   db:
     image: mysql:5.7
     environment:
@@ -35,6 +37,20 @@ services:
       - db-data:/var/lib/mysql
     ports:
       - '3306:3306'
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:7.3.1
+    ports:
+      - "9200:9200"
+    environment:
+      - discovery.type=single-node
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+  kibana:
+    image: docker.elastic.co/kibana/kibana:7.3.1
+    depends_on:
+      - elasticsearch
+    ports:
+      - "5601:5601"
   # redis:
   #   image: "redis:5.0.5-alpine"
   #   ports:
@@ -43,6 +59,8 @@ services:
   #     - redis-data:/data
 volumes:
   db-data:
+    driver: local
+  es-data:
     driver: local
   # redis-data:
   #   driver: local

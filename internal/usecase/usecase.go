@@ -36,7 +36,6 @@ type tagRepository interface {
 
 type ogpRepository interface {
 	GetLinkTitle(url string) (string, error)
-	SaveLinkTitle(title string, linkID int) error
 }
 
 // NewInteractor get interactor
@@ -213,7 +212,8 @@ func (i *interactor) GetLinkOriginal(id int) {
 		i.outputPort.ResponseError(err)
 		return
 	}
-	if err := i.repository.SaveLinkTitle(title, link.GetID()); err != nil {
+	link.SetTitle(title)
+	if err := i.repository.UpdateLink(link); err != nil {
 		log.Printf("GetLinkTitle error: %s", err)
 		i.outputPort.ResponseError(err)
 		return

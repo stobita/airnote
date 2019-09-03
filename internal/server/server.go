@@ -1,7 +1,6 @@
 package server
 
 import (
-	"database/sql"
 	"net/http"
 
 	"github.com/gin-contrib/cors"
@@ -24,17 +23,11 @@ func Run() error {
 		return err
 	}
 	httpClient := http.DefaultClient
-	engine, err := getEngine(db, httpClient)
+	esClient, err := infrastructure.NewESClient()
 	if err != nil {
 		return err
 	}
-	return engine.Run()
-}
-
-func getEngine(db *sql.DB, httpClient *http.Client) (*gin.Engine, error) {
-	r := gin.Default()
-
-	repo := repository.New(db, httpClient)
+	repo := repository.New(db, httpClient, esClient)
 
 	controller := controller.New(
 		func(o usecase.OutputPort) usecase.InputPort {
@@ -44,6 +37,16 @@ func getEngine(db *sql.DB, httpClient *http.Client) (*gin.Engine, error) {
 			return presenter.New(w)
 		},
 	)
+
+	engine, err := getEngine(controller)
+	if err != nil {
+		return err
+	}
+	return engine.Run()
+}
+
+func getEngine(controller *controller.Controller) (*gin.Engine, error) {
+	r := gin.Default()
 
 	r.Use(cors.New(cors.Config{
 		AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},

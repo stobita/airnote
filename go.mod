@@ -11,6 +11,7 @@ require (
 	github.com/google/go-cmp v0.3.1
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
 	github.com/mattn/go-isatty v0.0.8 // indirect
+	github.com/olivere/elastic/v7 v7.0.6
 	github.com/onsi/ginkgo v1.10.0 // indirect
 	github.com/onsi/gomega v1.7.0 // indirect
 	github.com/pkg/errors v0.8.1
