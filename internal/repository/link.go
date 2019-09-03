@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"fmt"
 
 	"github.com/pkg/errors"
 	"github.com/stobita/airnote/internal/domain/model"
@@ -74,6 +75,7 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 		qm.Load(
 			rdb.LinkRels.LinkOriginal,
 		),
+		qm.OrderBy(fmt.Sprintf("%s %s", rdb.LinkColumns.UpdatedAt, "desc")),
 	).All(ctx, r.db)
 	if err != nil {
 		return nil, errors.Wrap(err, "get All error")
@@ -257,16 +259,23 @@ func (r *repository) UpdateLink(input *model.Link) error {
 
 func (r *repository) DeleteLink(model *model.Link) error {
 	ctx := context.Background()
-	link, err := rdb.Links(rdb.LinkWhere.ID.EQ(model.GetID()), qm.Load(
-		qm.Rels(
-			rdb.LinkRels.LinksTags,
-			rdb.LinksTagRels.Tag,
+	link, err := rdb.Links(
+		rdb.LinkWhere.ID.EQ(model.GetID()),
+		qm.Load(
+			qm.Rels(
+				rdb.LinkRels.LinksTags,
+				rdb.LinksTagRels.Tag,
+			),
 		),
-	)).One(ctx, r.db)
+		qm.Load(rdb.LinkRels.LinkOriginal),
+	).One(ctx, r.db)
 	if err != nil {
 		return err
 	}
 	if _, err := link.R.LinksTags.DeleteAll(ctx, r.db); err != nil {
+		return err
+	}
+	if _, err := link.R.LinkOriginal.Delete(ctx, r.db); err != nil {
 		return err
 	}
 	if _, err := link.Delete(ctx, r.db); err != nil {
@@ -290,6 +299,7 @@ func (r *repository) GetLinksByTagID(tagID int) ([]*model.Link, error) {
 		),
 		qm.InnerJoin("links_tags on links.id = links_tags.link_id"),
 		rdb.LinksTagWhere.TagID.EQ(tagID),
+		qm.OrderBy(fmt.Sprintf("%s %s", rdb.LinkColumns.UpdatedAt, "desc")),
 	).All(ctx, r.db)
 	if err != nil {
 		return nil, err
@@ -324,7 +334,9 @@ func (r *repository) GetTag(id int) (*model.Tag, error) {
 
 func (r *repository) GetTags() ([]*model.Tag, error) {
 	ctx := context.Background()
-	tags, err := rdb.Tags().All(ctx, r.db)
+	tags, err := rdb.Tags(
+		qm.OrderBy("(SELECT count(*) FROM links_tags WHERE tags.id = links_tags.tag_id) desc"),
+	).All(ctx, r.db)
 	if err != nil {
 		return nil, err
 	}
