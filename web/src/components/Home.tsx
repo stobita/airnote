@@ -81,6 +81,12 @@ export const Home = () => {
     setSelectedLink(l);
   }, []);
 
+  const handleOnWordSearchSubmit = (word: string) => {
+    linksRepository.searchLink(word).then(links => {
+      setLinks(links);
+    });
+  };
+
   const SlideMenuContent = () => {
     switch (true) {
       case formOpen:
@@ -129,7 +135,10 @@ export const Home = () => {
           />
         </Left>
         <Right>
-          <Header onClickAddButton={showForm} />
+          <Header
+            onClickAddButton={showForm}
+            onSubmitWordSearch={handleOnWordSearchSubmit}
+          />
           <LinkIndex
             items={links}
             onSelectItem={selectItem}
