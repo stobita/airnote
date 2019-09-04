@@ -41,7 +41,12 @@ func (c *Controller) GetLinks() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
-		i.GetAllLinks()
+		word := ctx.Query("word")
+		if word == "" {
+			i.GetAllLinks()
+		} else {
+			i.SearchLinks(word)
+		}
 	}
 }
 
@@ -115,7 +120,6 @@ func (c *Controller) GetTags() gin.HandlerFunc {
 		o := c.outputPortFactory(ctx.Writer)
 		i := c.inputPortFactory(o)
 		i.GetAllTags()
-
 	}
 }
 

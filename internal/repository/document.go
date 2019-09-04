@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/olivere/elastic/v7"
 	"github.com/stobita/airnote/internal/domain/model"
 )
 
@@ -56,4 +57,27 @@ func (r *repository) DeleteLinkDocument(model *model.Link) error {
 		return err
 	}
 	return nil
+}
+
+func (r *repository) SearchLinks(word string) ([]int, error) {
+	ctx := context.Background()
+	query := elastic.NewMultiMatchQuery(word, "title", "description")
+	result, err := r.esClient.Search().
+		Index(linkIndex).
+		Query(query).
+		Do(ctx)
+	if err != nil {
+		return nil, err
+	}
+	var ids []int
+	if result.Hits.TotalHits.Value > 0 {
+		for _, hit := range result.Hits.Hits {
+			id, err := strconv.Atoi(hit.Id)
+			if err != nil {
+				return nil, err
+			}
+			ids = append(ids, id)
+		}
+	}
+	return ids, nil
 }
