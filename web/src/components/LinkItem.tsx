@@ -66,7 +66,7 @@ export const useLinkItem = (
 };
 
 const Wrapper = styled.div`
-background: ${props => props.theme.bg}
+  background: ${props => props.theme.bg};
   border: 1px solid ${colors.borderGray};
   border-radius: 4px;
   box-sizing: border-box;

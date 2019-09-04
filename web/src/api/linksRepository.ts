@@ -22,6 +22,18 @@ const linksRepository = {
     }
     return res.data.items;
   },
+  async searchLink(word: string): Promise<Link[]> {
+    const res = await repository
+      .get<Collection<Link>>(`${resource}?word=${word}`)
+      .catch(e => {
+        console.log(e);
+        return null;
+      });
+    if (res == null || !res.data.items) {
+      return [];
+    }
+    return res.data.items;
+  },
   async createLink(payload: LinkPayload): Promise<Link> {
     const res = await repository.post<Link>(`${resource}`, payload);
     return res.data;
