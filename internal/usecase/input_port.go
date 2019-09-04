@@ -6,6 +6,7 @@ type InputPort interface {
 	AddLink(i LinkInputData)
 	UpdateLink(id int, i LinkInputData)
 	DeleteLink(id int)
+	SearchLinks(word string)
 
 	GetLinkOriginal(id int)
 

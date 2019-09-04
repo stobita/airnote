@@ -88,6 +88,38 @@ func (r *repository) GetLinks() ([]*model.Link, error) {
 	return result, nil
 }
 
+func (r *repository) GetLinksByIDs(ids []int) ([]*model.Link, error) {
+	if len(ids) < 1 {
+		return nil, nil
+	}
+	ctx := context.Background()
+	queryIDs := []interface{}{}
+	for _, v := range ids {
+		queryIDs = append(queryIDs, v)
+	}
+	links, err := rdb.Links(
+		qm.Load(
+			qm.Rels(
+				rdb.LinkRels.LinksTags,
+				rdb.LinksTagRels.Tag,
+			),
+		),
+		qm.Load(
+			rdb.LinkRels.LinkOriginal,
+		),
+		qm.WhereIn("id in ?", queryIDs...),
+		qm.OrderBy(fmt.Sprintf("%s %s", rdb.LinkColumns.UpdatedAt, "desc")),
+	).All(ctx, r.db)
+	if err != nil {
+		return nil, errors.Wrap(err, "get All error")
+	}
+	result, err := makeLinksModel(links)
+	if err != nil {
+		return nil, errors.Wrap(err, "setLinksResult error")
+	}
+	return result, nil
+}
+
 func makeLinksModel(links rdb.LinkSlice) ([]*model.Link, error) {
 	var result []*model.Link
 	for _, link := range links {

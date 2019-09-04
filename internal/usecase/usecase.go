@@ -21,10 +21,12 @@ type repository interface {
 type linkRepository interface {
 	GetLink(id int) (*model.Link, error)
 	GetLinks() ([]*model.Link, error)
+	GetLinksByIDs(ids []int) ([]*model.Link, error)
 	GetLinksByTagID(tagID int) ([]*model.Link, error)
 	SaveLink(input *model.Link) error
 	UpdateLink(*model.Link) error
 	DeleteLink(*model.Link) error
+	SearchLinks(word string) ([]int, error)
 }
 
 type tagRepository interface {
@@ -269,6 +271,29 @@ func (i *interactor) GetAllTags() {
 		})
 	}
 	if err := i.outputPort.ResponseTags(o); err != nil {
+		log.Print(err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+}
+
+func (i *interactor) SearchLinks(word string) {
+	ids, err := i.repository.SearchLinks(word)
+	if err != nil {
+		log.Print(err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+	links, err := i.repository.GetLinksByIDs(ids)
+	if err != nil {
+		log.Print(err)
+		i.outputPort.ResponseError(err)
+		return
+	}
+
+	o := makeLinksOutputData(links)
+
+	if err := i.outputPort.ResponseLinks(o); err != nil {
 		log.Print(err)
 		i.outputPort.ResponseError(err)
 		return
