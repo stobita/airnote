@@ -1,6 +1,6 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import styled, { ThemeProvider } from "styled-components";
-import { Link, Tag } from "../model/link";
+import { Link } from "../model/link";
 import { Sidebar } from "./Sidebar";
 import { LinkIndex } from "./LinkIndex";
 import { Header } from "./Header";
@@ -10,14 +10,15 @@ import { LinkDetail } from "./LinkDetail";
 import linksRepository from "../api/linksRepository";
 import tagsRepository from "../api/tagsRepository";
 import colors from "../colors";
+import { DataContext } from "../context/dataContext";
 
 export const Home = () => {
   const [links, setLinks] = useState<Link[]>([]);
-  const [tags, setTags] = useState<Tag[]>([]);
   const [formOpen, setFormOpen] = useState(false);
   const [detailOpen, setDetailOpen] = useState(false);
   const [selectedLink, setSelectedLink] = useState<Link>();
   const [isPanel, setIsPanel] = useState(false);
+  const { tags, setTags } = useContext(DataContext);
 
   useEffect(() => {
     linksRepository.getAllLinks().then(links => {
@@ -127,7 +128,6 @@ export const Home = () => {
       <Wrapper>
         <Left>
           <Sidebar
-            tags={tags}
             onClickTag={onClickTag}
             onClickTitle={refreshLinks}
             isPanelView={isPanel}
