@@ -1,4 +1,4 @@
-FROM golang:1.12.7-alpine3.10
+FROM golang:1.13.0-alpine3.10
 WORKDIR /airnote
 COPY . /airnote
 RUN apk add --update --no-cache \

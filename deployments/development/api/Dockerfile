@@ -1,4 +1,4 @@
-FROM golang:1.12.7
+FROM golang:1.13.0
 COPY . /airnote
 WORKDIR /airnote
 RUN go get -u github.com/pressly/goose/cmd/goose
