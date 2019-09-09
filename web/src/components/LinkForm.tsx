@@ -40,7 +40,8 @@ export const LinkForm = (props: Props) => {
     setFormValue(prev => ({ ...prev, tags: items }));
   }, []);
 
-  const onSubmit = useCallback(() => {
+  const onSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
     if (!formValue.url) {
       return setFormError("url must be set");
     }
@@ -57,53 +58,53 @@ export const LinkForm = (props: Props) => {
       description: "",
       tags: []
     });
-  }, [formValue, props]);
+  };
 
   return (
     <>
       {formError && <ErrorMessage>{formError}</ErrorMessage>}
-      <Field>
-        <Input
-          name="url"
-          type="text"
-          placeholder="URL"
-          value={formValue.url}
-          onChange={onChangeValue}
-        />
-      </Field>
-      <Field>
-        <Textarea
-          name="description"
-          placeholder="Description"
-          value={formValue.description}
-          onChange={onChangeValue}
-        />
-      </Field>
-      <Field>
-        <TagInput
-          name="tag"
-          placeholder="Tag"
-          value={formValue.tags ? formValue.tags : []}
-          onChange={onChangeTag}
-          tags={props.tags}
-        />
-      </Field>
-      <Field>
-        {props.onCancel ? (
-          <ButtonPair
-            left={
-              <Button primary onClick={onSubmit}>
-                Save
-              </Button>
-            }
-            right={<Button onClick={props.onCancel}>Cancel</Button>}
+      <form onSubmit={onSubmit}>
+        <Field>
+          <Input
+            name="url"
+            type="text"
+            placeholder="URL"
+            value={formValue.url}
+            onChange={onChangeValue}
           />
-        ) : (
-          <Button primary onClick={onSubmit}>
-            Save
-          </Button>
-        )}
-      </Field>
+        </Field>
+        <Field>
+          <Textarea
+            name="description"
+            placeholder="Description"
+            value={formValue.description}
+            onChange={onChangeValue}
+          />
+        </Field>
+        <Field>
+          <TagInput
+            name="tag"
+            placeholder="Tag"
+            value={formValue.tags ? formValue.tags : []}
+            onChange={onChangeTag}
+            tags={props.tags}
+          />
+        </Field>
+        <Field>
+          {props.onCancel ? (
+            <ButtonPair
+              left={<Button primary>Save</Button>}
+              right={
+                <Button type="button" onClick={props.onCancel}>
+                  Cancel
+                </Button>
+              }
+            />
+          ) : (
+            <Button primary>Save</Button>
+          )}
+        </Field>
+      </form>
     </>
   );
 };
