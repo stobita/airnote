@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import styled from "styled-components";
-import { Tag } from "../model/link";
 import { ReactComponent as SettingIconImage } from "../assets/setting.svg";
 import { Switch } from "./Switch";
+import { DataContext } from "../context/dataContext";
 
 interface Props {
-  tags: Tag[];
   onClickTitle: () => void;
   onClickTag: (id: number) => void;
   isPanelView: boolean;
@@ -14,6 +13,7 @@ interface Props {
 
 export const Sidebar = (props: Props) => {
   const [settingActive, setSettingActive] = useState(false);
+  const { tags } = useContext(DataContext);
   const onClickConfig = () => {
     setSettingActive(prev => !prev);
   };
@@ -27,7 +27,7 @@ export const Sidebar = (props: Props) => {
     <Wrapper>
       <Title onClick={props.onClickTitle}>AirNote</Title>
       <ul>
-        {props.tags.map(tag => (
+        {tags.map(tag => (
           <Item key={tag.id} data-id={tag.id} onClick={handleOnClickTag}>
             {tag.text}
           </Item>
