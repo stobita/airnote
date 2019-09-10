@@ -111,46 +111,36 @@ export const Home = () => {
     }
   };
 
-  // TODO: theme switch
-  const lightTheme = {
-    primary: colors.primary,
-    bg: colors.mainWhite,
-    text: colors.mainBlack,
-    border: colors.borderGray
-  };
-
   const togglePanelView = () => {
     setIsPanel(prev => !prev);
   };
 
   return (
-    <ThemeProvider theme={lightTheme}>
-      <Wrapper>
-        <Left>
-          <Sidebar
-            onClickTag={onClickTag}
-            onClickTitle={refreshLinks}
-            isPanelView={isPanel}
-            setIsPanelView={togglePanelView}
-          />
-        </Left>
-        <Right>
-          <Header
-            onClickAddButton={showForm}
-            onSubmitWordSearch={handleOnWordSearchSubmit}
-          />
-          <LinkIndex
-            items={links}
-            onSelectItem={selectItem}
-            onClickTag={onClickTag}
-            isPanelView={isPanel}
-          />
-        </Right>
-        <SlideMenu onClose={closeSlide} open={formOpen || detailOpen}>
-          <SlideMenuContent />
-        </SlideMenu>
-      </Wrapper>
-    </ThemeProvider>
+    <Wrapper>
+      <Left>
+        <Sidebar
+          onClickTag={onClickTag}
+          onClickTitle={refreshLinks}
+          isPanelView={isPanel}
+          setIsPanelView={togglePanelView}
+        />
+      </Left>
+      <Right>
+        <Header
+          onClickAddButton={showForm}
+          onSubmitWordSearch={handleOnWordSearchSubmit}
+        />
+        <LinkIndex
+          items={links}
+          onSelectItem={selectItem}
+          onClickTag={onClickTag}
+          isPanelView={isPanel}
+        />
+      </Right>
+      <SlideMenu onClose={closeSlide} open={formOpen || detailOpen}>
+        <SlideMenuContent />
+      </SlideMenu>
+    </Wrapper>
   );
 };
 
