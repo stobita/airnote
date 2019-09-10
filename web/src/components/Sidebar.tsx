@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { ReactComponent as SettingIconImage } from "../assets/setting.svg";
 import { Switch } from "./Switch";
 import { DataContext } from "../context/dataContext";
+import { ViewContext } from "../context/viewContext";
 
 interface Props {
   onClickTitle: () => void;
@@ -13,7 +14,9 @@ interface Props {
 
 export const Sidebar = (props: Props) => {
   const [settingActive, setSettingActive] = useState(false);
+  const { themeName, setThemeName } = useContext(ViewContext);
   const { tags } = useContext(DataContext);
+  const isDarkTheme = themeName === "dark";
   const onClickConfig = () => {
     setSettingActive(prev => !prev);
   };
@@ -22,6 +25,9 @@ export const Sidebar = (props: Props) => {
     if (id) {
       props.onClickTag(Number(id));
     }
+  };
+  const handleOnClickThemeSwitch = () => {
+    setThemeName(prev => (prev === "light" ? "dark" : "light"));
   };
   return (
     <Wrapper>
@@ -36,6 +42,10 @@ export const Sidebar = (props: Props) => {
       <Bottom>
         {settingActive && (
           <Setting>
+            <Field>
+              <label>Dark Theme</label>
+              <Switch value={isDarkTheme} onChange={handleOnClickThemeSwitch} />
+            </Field>
             <Field>
               <label>Panel View</label>
               <Switch

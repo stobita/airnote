@@ -21,7 +21,7 @@ export const Switch = (props: Props) => {
     </Wrapper>
   );
 };
-const Wrapper = styled.p`
+const Wrapper = styled.div`
   border: 1px solid ${props => props.theme.border};
   display: flex;
   cursor: pointer;
