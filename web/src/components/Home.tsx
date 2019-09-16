@@ -39,11 +39,15 @@ export const Home = () => {
         <Sidebar onClickTitle={refreshLinks} />
       </Left>
       <Right>
-        <Header
-          onClickAddButton={showForm}
-          onSubmitWordSearch={handleOnWordSearchSubmit}
-        />
-        <LinkIndex />
+        <Top>
+          <Header
+            onClickAddButton={showForm}
+            onSubmitWordSearch={handleOnWordSearchSubmit}
+          />
+        </Top>
+        <Bottom>
+          <LinkIndex />
+        </Bottom>
       </Right>
       <SlideMenu>
         <SlideMenuContent />
@@ -54,14 +58,29 @@ export const Home = () => {
 
 const Wrapper = styled.div`
   display: flex;
+  background: ${props => props.theme.bg};
+  height: 100%;
+  min-height: 100vh;
 `;
 
 const Left = styled.div`
   flex: 1;
+  position: fixed;
+  min-width: 240px;
 `;
 
 const Right = styled.div`
-  flex: 4;
+  flex: 5;
+  margin-left: 240px;
+`;
+
+const Top = styled.div`
+  height: 48px;
+`;
+
+const Bottom = styled.div`
+  margin-top: 16px;
+  heih
 `;
 
 export default Home;

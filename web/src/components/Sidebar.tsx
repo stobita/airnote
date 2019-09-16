@@ -46,13 +46,14 @@ const Field = styled.div`
 `;
 
 const Wrapper = styled.div`
-  background: ${props => props.theme.bg};
-  color: ${props => props.theme.text};
+  background: ${props => props.theme.main};
+  color: ${props => props.theme.solid};
   border-right: 1px solid ${props => props.theme.border};
   display: flex;
   flex-direction: column;
   min-height: 100vh;
   height: 100%;
+  flex: 1;
   padding: 16px 24px;
   box-sizing: border-box;
 `;
@@ -67,6 +68,7 @@ const Bottom = styled.div`
 `;
 
 const SettingIcon = styled(SettingIconImage)`
+  fill: ${props => props.theme.solid};
   cursor: pointer;
   height: 36px;
 `;

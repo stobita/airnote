@@ -27,6 +27,5 @@ const Anchor = styled.a`
 `;
 const Description = styled.p`
   word-break: break-word;
-  margin: 0;
-  margin-bottom: 8px;
+  margin: 8px 0;
 `;

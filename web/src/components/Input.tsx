@@ -1,9 +1,9 @@
 import styled from "styled-components";
-import colors from "../colors";
 import { FieldItemBase } from "./FieldItemBase";
 
 export const Input = styled.input`
   ${FieldItemBase}
+  color: ${props => props.theme.solid};
   border: 1px solid ${props => props.theme.border};
-  background: ${colors.white};
+  background: ${props => props.theme.bg};
 `;

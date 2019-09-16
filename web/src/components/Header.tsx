@@ -18,10 +18,13 @@ export const Header = (props: Props) => {
 };
 
 const Wrapper = styled.div`
-  background: ${props => props.theme.bg};
-  color: ${props => props.theme.text};
+  position: fixed;
+  width: calc(100% - 240px);
+  background: ${props => props.theme.main};
+  color: ${props => props.theme.solid};
   border-bottom: 1px solid ${props => props.theme.border};
   display: flex;
   justify-content: space-between;
   padding: 8px 24px;
+  box-sizing: border-box;
 `;

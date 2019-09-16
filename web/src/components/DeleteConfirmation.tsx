@@ -1,6 +1,5 @@
 import React from "react";
 import styled from "styled-components";
-import colors from "../colors";
 import { Button } from "./Button";
 import { ButtonPair } from "./ButtonPair";
 
@@ -33,5 +32,5 @@ const Wrapper = styled.div`
 `;
 
 const Message = styled.p`
-  color: ${colors.danger};
+  color: ${props => props.theme.danger};
 `;

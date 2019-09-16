@@ -14,9 +14,9 @@ export const CloseButton = (props: Props) => {
   );
 };
 const Button = styled.button`
-  height: 64px;
-  width: 64px;
-  border-radius: 32px;
+  height: 48px;
+  width: 48px;
+  border-radius: 24px;
   position: relative;
   display: flex;
   justify-content: center;
@@ -24,7 +24,7 @@ const Button = styled.button`
 `;
 
 const ButtonInner = styled.span`
-  background: ${props => props.theme.text};
+  background: ${props => props.theme.solid};
   position: absolute;
   width: 50%;
   height: 2px;

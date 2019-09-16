@@ -29,7 +29,7 @@ const ButtonInner = styled.span`
   position: absolute;
   width: 50%;
   height: 2px;
-  background: ${props => props.theme.text};
+  background: ${props => props.theme.solid};
   border-radius: 4px;
   &:nth-of-type(1) {
     transform: rotate(90deg);
