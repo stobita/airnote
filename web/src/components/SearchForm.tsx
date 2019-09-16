@@ -40,7 +40,7 @@ const Wrapper = styled.div`
 const Input = styled.input`
   background: ${colors.white};
   border: 1px solid ${props => props.theme.border};
-  padding: 16px;
+  padding: 8px;
   font-size: 1.2rem;
   width: 100%;
 `;

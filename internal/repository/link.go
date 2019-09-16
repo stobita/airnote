@@ -27,9 +27,6 @@ func (r *repository) GetLink(id int) (*model.Link, error) {
 		),
 		qm.Load(rdb.LinkRels.LinkOriginal),
 	).One(ctx, r.db)
-	if err == sql.ErrNoRows {
-		return nil, nil
-	}
 	if err != nil {
 		return nil, err
 	}

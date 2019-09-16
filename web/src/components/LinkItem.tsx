@@ -1,68 +1,43 @@
-import React from "react";
+import React, { useState, useContext } from "react";
 import { Link } from "../model/link";
 import styled from "styled-components";
 import colors from "../colors";
-import { TagBadge } from "./TagBadge";
+import { LinkItemDetail } from "./LinkItemDetail";
+import { LinkItemTags } from "./LinkItemTags";
+import { ViewContext } from "../context/viewContext";
+import { ReactComponent as EditIconImage } from "../assets/edit.svg";
 
 interface Props {
   item: Link;
-  onClick: (l: Link) => void;
-  onClickTag: (id: number) => void;
 }
 
 export const LinkItem = (props: Props) => {
-  const {
-    item,
-    handleOnClick,
-    displayDescription,
-    handleOnClickTag
-  } = useLinkItem(props.item, false, props.onClick, props.onClickTag);
+  const { item } = props;
+  const [expand, setExpand] = useState(false);
+  const { setSlideTargetLinkId } = useContext(ViewContext);
+  const handleOnClick = () => {
+    setExpand(prev => !prev);
+  };
+
+  const handleOnClickEdit = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSlideTargetLinkId(item.id);
+  };
 
   return (
     <Wrapper onClick={handleOnClick}>
+      <Title>{item.title && item.title}</Title>
+      {expand && <LinkItemDetail item={item}></LinkItemDetail>}
       <Bottom>
-        <Title>{item.title && item.title}</Title>
-        <Description>{displayDescription}</Description>
-        <Tags>
-          {item.tags.map(v => (
-            <TagBadge data-id={v.id} onClick={handleOnClickTag} key={v.id}>
-              {v.text}
-            </TagBadge>
-          ))}
-        </Tags>
+        <LinkItemTags items={item.tags}></LinkItemTags>
+        {expand && (
+          <Operator>
+            <EditIcon onClick={handleOnClickEdit} />
+          </Operator>
+        )}
       </Bottom>
     </Wrapper>
   );
-};
-
-export const useLinkItem = (
-  item: Link,
-  isBlock: boolean,
-  onClick: (l: Link) => void,
-  onClickTag: (id: number) => void
-) => {
-  const handleOnClick = () => {
-    onClick(item);
-  };
-
-  const handleOnClickTag = (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    const id = e.currentTarget.dataset.id;
-    if (id) {
-      onClickTag(Number(id));
-    }
-  };
-
-  const { description } = item;
-  const displayDescriptionLength = isBlock ? 30 : 60;
-
-  const displayDescription =
-    description.length > displayDescriptionLength - 1
-      ? `${description.slice(0, displayDescriptionLength)}...`
-      : description.length > 0
-      ? description
-      : "no description";
-  return { item, handleOnClick, displayDescription, handleOnClickTag };
 };
 
 const Wrapper = styled.div`
@@ -74,20 +49,27 @@ const Wrapper = styled.div`
   cursor: pointer;
   overflow: hidden;
   width: 100%;
-`;
-
-const Description = styled.p`
-  word-break: break-word;
-`;
-
-const Bottom = styled.div`
   padding: 8px;
 `;
 
-const Tags = styled.div`
+const Bottom = styled.div`
   display: flex;
+  align-items: center;
 `;
 
 const Title = styled.p`
   font-weight: bold;
+  margin: 0;
+  margin-bottom: 8px;
+`;
+
+const Operator = styled.div`
+  flex: 2;
+  display: flex;
+  justify-content: flex-end;
+`;
+
+const EditIcon = styled(EditIconImage)`
+  fill: ${props => props.theme.text};
+  height: 24px;
 `;

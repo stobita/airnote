@@ -15,7 +15,7 @@ export const DeleteConfirmation = (props: Props) => {
       <Message>Are you sure you want to delete it?</Message>
       <ButtonPair
         left={
-          <Button danger onClick={props.onSubmit}>
+          <Button danger type="button" onClick={props.onSubmit}>
             Delete
           </Button>
         }

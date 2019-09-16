@@ -108,6 +108,7 @@ func (p *presenter) ResponseError(e error) error {
 			Message: e.Error(),
 		},
 	}
+	p.writer.WriteHeader(http.StatusInternalServerError)
 	return json.NewEncoder(p.writer).Encode(j)
 }
 
