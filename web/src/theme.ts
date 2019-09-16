@@ -5,16 +5,28 @@ export type ThemeType = typeof themeNames[number];
 
 const lightTheme = {
   primary: colors.primary,
-  bg: colors.mainWhite,
-  text: colors.mainBlack,
-  border: colors.borderGray
+  lightPrimary: colors.lightPrimary,
+  primaryInner: colors.white,
+  main: colors.mainWhite,
+  bg: colors.paleGray,
+  solid: colors.mainBlack,
+  weak: colors.lightGray,
+  border: colors.borderGray,
+  danger: colors.danger,
+  dangerInner: colors.white
 };
 
 const darkTheme = {
   primary: colors.primary,
-  bg: colors.mainBlack,
-  text: colors.mainWhite,
-  border: colors.borderGray
+  lightPrimary: colors.lightPrimary,
+  primaryInner: colors.white,
+  main: colors.mainBlack,
+  bg: colors.black,
+  solid: colors.mainWhite,
+  weak: colors.mainGray,
+  border: colors.mainGray,
+  danger: colors.danger,
+  dangerInner: colors.white
 };
 
 export default {

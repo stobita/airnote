@@ -1,7 +1,6 @@
 import React, { useState, useContext } from "react";
 import { Link } from "../model/link";
 import styled from "styled-components";
-import colors from "../colors";
 import { LinkItemDetail } from "./LinkItemDetail";
 import { LinkItemTags } from "./LinkItemTags";
 import { ViewContext } from "../context/viewContext";
@@ -41,8 +40,8 @@ export const LinkItem = (props: Props) => {
 };
 
 const Wrapper = styled.div`
-  background: ${props => props.theme.bg};
-  border: 1px solid ${colors.borderGray};
+  background: ${props => props.theme.main};
+  border: 1px solid ${props => props.theme.border};
   border-radius: 4px;
   box-sizing: border-box;
   margin: 8px;
@@ -50,6 +49,7 @@ const Wrapper = styled.div`
   overflow: hidden;
   width: 100%;
   padding: 8px;
+  color: ${props => props.theme.solid};
 `;
 
 const Bottom = styled.div`
@@ -70,6 +70,6 @@ const Operator = styled.div`
 `;
 
 const EditIcon = styled(EditIconImage)`
-  fill: ${props => props.theme.text};
+  fill: ${props => props.theme.solid};
   height: 24px;
 `;

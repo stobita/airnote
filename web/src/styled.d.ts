@@ -3,8 +3,14 @@ import "styled-components";
 declare module "styled-components" {
   export interface DefaultTheme {
     primary: string;
+    primaryInner: string;
+    lightPrimary: string;
+    main: string;
     bg: string;
-    text: string;
+    solid: string;
+    weak: string;
     border: string;
+    danger: string;
+    dangerInner: string;
   }
 }

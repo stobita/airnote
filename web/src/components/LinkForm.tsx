@@ -1,7 +1,6 @@
 import React, { useState, useCallback, useContext, useEffect } from "react";
 import styled from "styled-components";
 import linksRepository, { LinkPayload } from "../api/linksRepository";
-import colors from "../colors";
 import { Button } from "./Button";
 import { ButtonPair } from "./ButtonPair";
 import { TagInput } from "./TagInput";
@@ -107,6 +106,7 @@ export const LinkForm = () => {
   return (
     <>
       {formError && <ErrorMessage>{formError}</ErrorMessage>}
+      {target && target.title && <h3>{target.title}</h3>}
       <form onSubmit={onSubmit}>
         <Field>
           <Input
@@ -163,11 +163,12 @@ export const LinkForm = () => {
 };
 
 const Field = styled.div`
+  color: ${props => props.theme.solid};
   display: flex;
   margin-bottom: 8px;
 `;
 
 const ErrorMessage = styled.div`
   padding: 16px 0;
-  color: ${colors.danger};
+  color: ${props => props.theme.danger};
 `;

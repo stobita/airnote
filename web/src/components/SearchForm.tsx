@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import styled from "styled-components";
-import colors from "../colors";
 
 interface Props {
   onSubmit: (word: string) => void;
@@ -38,7 +37,8 @@ const Wrapper = styled.div`
 `;
 
 const Input = styled.input`
-  background: ${colors.white};
+  background: ${props => props.theme.bg};
+  color: ${props => props.theme.solid};
   border: 1px solid ${props => props.theme.border};
   padding: 8px;
   font-size: 1.2rem;

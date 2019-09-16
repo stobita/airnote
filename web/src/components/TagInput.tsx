@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
-import colors from "../colors";
 import { FieldItemBase } from "./FieldItemBase";
 import { AutoSuggest, useSuggest } from "./AutoSuggest";
 import { Tag } from "../model/link";
@@ -94,7 +93,7 @@ const InputArea = styled.div<{ hasTag: boolean }>`
   min-height: 36px;
   display: flex;
   flex-wrap: wrap;
-  background: ${colors.white};
+  background: ${props => props.theme.bg};
   padding: 4px 8px;
   ${props =>
     props.hasTag &&
@@ -105,6 +104,7 @@ const InputArea = styled.div<{ hasTag: boolean }>`
 
 const Input = styled.input<{ hasTag: boolean; error: boolean }>`
   ${FieldItemBase};
+  color: ${props => props.theme.solid};
   padding: 4px 0;
   margin: 0;
   height: auto;
@@ -112,7 +112,7 @@ const Input = styled.input<{ hasTag: boolean; error: boolean }>`
   ${props =>
     props.error &&
     css`
-      color: ${colors.danger};
+      color: ${props => props.theme.danger};
     `}
   ${props =>
     props.hasTag &&
@@ -123,8 +123,8 @@ const Input = styled.input<{ hasTag: boolean; error: boolean }>`
 
 const Item = styled.li<{ willRemove: boolean }>`
   position: relative;
-  color: ${colors.mainGray};
-  border: 1px solid ${colors.mainGray};
+  color: ${props => props.theme.solid};
+  border: 1px solid ${props => props.theme.solid};
   border-radius: 4px;
   margin-right: 4px;
   margin-bottom: 4px;
@@ -133,9 +133,9 @@ const Item = styled.li<{ willRemove: boolean }>`
   ${props =>
     props.willRemove &&
     css`
-      background: ${colors.thinGray};
-      color: ${colors.mainWhite};
-      border: 1px solid ${colors.thinGray};
+      background: ${props => props.theme.weak};
+      color: ${props => props.theme.solid};
+      border: 1px solid ${props => props.theme.border};
     `}
 `;
 
@@ -152,7 +152,7 @@ const RecommendItem = styled.span`
 `;
 
 const Recommended = styled.div`
-  color: ${props => props.theme.text};
+  color: ${props => props.theme.solid};
   margin-top: 8px;
   display: flex;
   flex-wrap: wrap;
@@ -228,6 +228,7 @@ const useTagInput = (
 
   const handleOnKeyDown = (e: React.KeyboardEvent) => {
     if (e.keyCode === 13) {
+      e.preventDefault();
       if (selectedSuggestion) {
         addItem(selectedSuggestion);
       } else {

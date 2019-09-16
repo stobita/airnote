@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from "react";
 import styled, { css } from "styled-components";
-import colors from "../colors";
 
 interface Props {
   items: string[];
@@ -88,16 +87,16 @@ export const useSuggest = (items: string[], inputValue: string) => {
 
 const Wrapper = styled.div`
   border: 1px solid ${props => props.theme.border};
-  background: ${colors.mainWhite};
+  background: ${props => props.theme.main};
   margin-top: -4px;
 `;
 
 const Hovered = css`
-  background: ${colors.primaryPale};
+  background: ${props => props.theme.lightPrimary};
 `;
 
 const Item = styled.li<{ isSelect: boolean }>`
   ${props => props.isSelect && Hovered}
   padding: 8px;
-  color: ${colors.mainGray};
+  color: ${props => props.theme.solid};
 `;

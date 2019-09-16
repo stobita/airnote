@@ -4,7 +4,6 @@ import { Transition } from "react-transition-group";
 import { TransitionStatus } from "react-transition-group/Transition";
 import { CloseButton } from "./CloseButton";
 import { ViewContext } from "../context/viewContext";
-import colors from "../colors";
 
 interface Props {
   children: ReactNode;
@@ -39,10 +38,12 @@ export const SlideMenu = (props: Props) => {
 const SlideMask = styled.div`
   width: 100%;
   height: 100%;
-  background: ${colors.thinGray};
+  min-height: 100%;
+  background: ${props => props.theme.weak};
   opacity: 0.5;
-  position: absolute;
+  position: fixed;
 `;
+
 const Head = styled.div`
   display: flex;
   justify-content: flex-end;
@@ -53,8 +54,8 @@ const slideWidth = 500;
 
 const Inner = styled.div<{ state: TransitionStatus }>`
   z-index: 1;
-  background: ${props => props.theme.bg};
-  color: ${props => props.theme.text};
+  background: ${props => props.theme.main};
+  color: ${props => props.theme.solid};
   border-left: 1px solid ${props => props.theme.border};
   padding: 8px 24px;
   box-sizing: border-box;
