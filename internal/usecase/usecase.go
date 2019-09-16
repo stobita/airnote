@@ -131,7 +131,11 @@ func (i *interactor) UpdateLink(id int, input LinkInputData) {
 		i.outputPort.ResponseError(err)
 		return
 	}
-	link.SetURL(input.URL)
+	if err := link.SetURL(input.URL); err != nil {
+		log.Printf("SetURL error: %s", err)
+		i.outputPort.ResponseError(err)
+		return
+	}
 	link.SetDescription(input.Description)
 
 	// TODO: fix duplicate AddLink

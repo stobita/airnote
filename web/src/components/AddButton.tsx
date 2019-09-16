@@ -16,9 +16,9 @@ export const AddButton = (props: Props) => {
 
 const Button = styled.button`
   border: 1px solid ${props => props.theme.border};
-  height: 64px;
-  width: 64px;
-  border-radius: 32px;
+  height: 48px;
+  width: 48px;
+  border-radius: 24px;
   position: relative;
   display: flex;
   justify-content: center;

@@ -23,5 +23,5 @@ const Wrapper = styled.div`
   border-bottom: 1px solid ${props => props.theme.border};
   display: flex;
   justify-content: space-between;
-  padding: 16px 24px;
+  padding: 8px 24px;
 `;

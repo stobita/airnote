@@ -23,12 +23,8 @@ type LinkInput struct {
 }
 
 func NewLink(i LinkInput) (*Link, error) {
-	if i.URL == "" {
-		return nil, errors.New("URL must set")
-	}
-	_, err := url.ParseRequestURI(i.URL)
-	if err != nil {
-		return nil, errors.Wrap(err, fmt.Sprintf("Invalid url: %s", i.URL))
+	if err := validateURL(i.URL); err != nil {
+		return nil, err
 	}
 
 	return &Link{
@@ -63,8 +59,12 @@ func (l *Link) SetID(id int) {
 	l.id = id
 }
 
-func (l *Link) SetURL(url string) {
+func (l *Link) SetURL(url string) error {
+	if err := validateURL(url); err != nil {
+		return err
+	}
 	l.url = url
+	return nil
 }
 
 func (l *Link) SetTitle(title string) {
@@ -77,4 +77,15 @@ func (l *Link) SetDescription(d string) {
 
 func (l *Link) SetTags(tags []*Tag) {
 	l.tags = tags
+}
+
+func validateURL(u string) error {
+	if u == "" {
+		return errors.New("URL must set")
+	}
+	_, err := url.ParseRequestURI(u)
+	if err != nil {
+		return errors.Wrap(err, fmt.Sprintf("Invalid url: %s", u))
+	}
+	return nil
 }

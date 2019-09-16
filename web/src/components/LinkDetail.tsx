@@ -2,7 +2,6 @@ import React, { useCallback, useState } from "react";
 import { Link, Tag } from "../model/link";
 import { ReactComponent as DefaultImage } from "../assets/default.svg";
 import styled from "styled-components";
-import { EditLinkForm } from "./EditLinkForm";
 import { DeleteConfirmation } from "./DeleteConfirmation";
 import linksRepository from "../api/linksRepository";
 import { LinkDetailBody } from "./LinkDetailBody";
@@ -23,9 +22,6 @@ export const LinkDetail = (props: Props) => {
       props.afterDelete();
     });
   }, [props]);
-  const handleEditCancel = useCallback(() => {
-    setIsEdit(false);
-  }, []);
   const handleDeleteCancel = useCallback(() => {
     setIsDelete(false);
   }, []);
@@ -34,26 +30,6 @@ export const LinkDetail = (props: Props) => {
   };
   const onClickDelete = () => {
     setIsDelete(true);
-  };
-
-  const Container = () => {
-    return isEdit ? (
-      <EditLinkForm
-        target={props.item}
-        afterSubmit={props.afterUpdate}
-        onCancel={handleEditCancel}
-        tags={props.tags}
-      />
-    ) : (
-      <LinkDetailBody
-        item={props.item}
-        isEdit={isEdit}
-        isDelete={isDelete}
-        onClickEdit={onClickEdit}
-        onClickDelete={onClickDelete}
-        onClickTag={props.onClickTag}
-      />
-    );
   };
 
   return (
@@ -66,7 +42,14 @@ export const LinkDetail = (props: Props) => {
             onCancel={handleDeleteCancel}
           />
         )}
-        <Container />
+        <LinkDetailBody
+          item={props.item}
+          isEdit={isEdit}
+          isDelete={isDelete}
+          onClickEdit={onClickEdit}
+          onClickDelete={onClickDelete}
+          onClickTag={props.onClickTag}
+        />
       </UnderWrapper>
     </Wrapper>
   );

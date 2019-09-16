@@ -1,86 +1,27 @@
-import React, { useState, useEffect, useCallback, useContext } from "react";
-import styled, { ThemeProvider } from "styled-components";
-import { Link } from "../model/link";
+import React, { useContext } from "react";
+import styled from "styled-components";
 import { Sidebar } from "./Sidebar";
 import { LinkIndex } from "./LinkIndex";
 import { Header } from "./Header";
 import { SlideMenu } from "./SlideMenu";
-import { AddLinkForm } from "./AddLinkForm";
-import { LinkDetail } from "./LinkDetail";
 import linksRepository from "../api/linksRepository";
-import tagsRepository from "../api/tagsRepository";
-import colors from "../colors";
 import { DataContext } from "../context/dataContext";
+import { ViewContext } from "../context/viewContext";
+import { LinkForm } from "./LinkForm";
 
 export const Home = () => {
-  const [links, setLinks] = useState<Link[]>([]);
-  const [formOpen, setFormOpen] = useState(false);
-  const [detailOpen, setDetailOpen] = useState(false);
-  const [selectedLink, setSelectedLink] = useState<Link>();
-  const [isPanel, setIsPanel] = useState(false);
-  const { tags, setTags } = useContext(DataContext);
+  const { setLinks } = useContext(DataContext);
+  const { setSlideOpen } = useContext(ViewContext);
 
-  useEffect(() => {
+  const refreshLinks = () => {
     linksRepository.getAllLinks().then(links => {
       setLinks(links);
     });
-    tagsRepository.getAllTags().then(tags => {
-      setTags(tags);
-    });
-  }, []);
+  };
 
-  const refreshLinks = useCallback(() => {
-    linksRepository.getAllLinks().then(links => {
-      setLinks(links);
-    });
-  }, []);
-
-  const onClickTag = useCallback(id => {
-    tagsRepository.getLinks(id).then(links => {
-      setLinks(links);
-    });
-  }, []);
-
-  const showForm = useCallback(() => {
-    setFormOpen(true);
-  }, []);
-
-  const closeSlide = useCallback(() => {
-    setFormOpen(false);
-    setDetailOpen(false);
-  }, []);
-
-  const handleAfterCreate = useCallback(async id => {
-    const links = await linksRepository.getAllLinks();
-    setLinks(links);
-    const original = await linksRepository.getLinkOriginal(id);
-    const newlinks = links.map(i =>
-      i.id === id ? { ...i, title: original.title } : i
-    );
-    console.log(newlinks);
-    setLinks(newlinks);
-  }, []);
-
-  const handleAfterUpdate = useCallback(() => {
-    linksRepository.getAllLinks().then(links => {
-      setLinks(links);
-      if (selectedLink) {
-        setSelectedLink(links.find(i => i.id === selectedLink.id));
-      }
-    });
-  }, [selectedLink]);
-
-  const handleAfterDelete = useCallback(() => {
-    linksRepository.getAllLinks().then(links => {
-      setLinks(links);
-      setDetailOpen(false);
-    });
-  }, []);
-
-  const selectItem = useCallback((l: Link) => {
-    setDetailOpen(true);
-    setSelectedLink(l);
-  }, []);
+  const showForm = () => {
+    setSlideOpen(true);
+  };
 
   const handleOnWordSearchSubmit = (word: string) => {
     linksRepository.searchLink(word).then(links => {
@@ -89,55 +30,22 @@ export const Home = () => {
   };
 
   const SlideMenuContent = () => {
-    switch (true) {
-      case formOpen:
-        return <AddLinkForm afterSubmit={handleAfterCreate} tags={tags} />;
-      case detailOpen:
-        if (selectedLink) {
-          return (
-            <LinkDetail
-              item={selectedLink}
-              tags={tags}
-              afterUpdate={handleAfterUpdate}
-              afterDelete={handleAfterDelete}
-              onClickTag={onClickTag}
-            />
-          );
-        } else {
-          return <></>;
-        }
-      default:
-        return <></>;
-    }
-  };
-
-  const togglePanelView = () => {
-    setIsPanel(prev => !prev);
+    return <LinkForm />;
   };
 
   return (
     <Wrapper>
       <Left>
-        <Sidebar
-          onClickTag={onClickTag}
-          onClickTitle={refreshLinks}
-          isPanelView={isPanel}
-          setIsPanelView={togglePanelView}
-        />
+        <Sidebar onClickTitle={refreshLinks} />
       </Left>
       <Right>
         <Header
           onClickAddButton={showForm}
           onSubmitWordSearch={handleOnWordSearchSubmit}
         />
-        <LinkIndex
-          items={links}
-          onSelectItem={selectItem}
-          onClickTag={onClickTag}
-          isPanelView={isPanel}
-        />
+        <LinkIndex />
       </Right>
-      <SlideMenu onClose={closeSlide} open={formOpen || detailOpen}>
+      <SlideMenu>
         <SlideMenuContent />
       </SlideMenu>
     </Wrapper>

@@ -26,6 +26,7 @@ export const LinkDetailBody = (props: Props) => {
     props.item.url.length > 48
       ? `${props.item.url.slice(0, 36)}...`
       : props.item.url;
+
   return (
     <>
       <Row>

@@ -1,41 +1,16 @@
-import React, { useCallback } from "react";
-import { Link } from "../model/link";
+import React, { useContext } from "react";
 import { LinkItem } from "./LinkItem";
 import styled, { css } from "styled-components";
-import { LinkItemPanel } from "./LinkItemPanel";
+import { DataContext } from "../context/dataContext";
 
-interface Props {
-  items: Link[];
-  onSelectItem: (l: Link) => void;
-  onClickTag: (id: number) => void;
-  isPanelView: boolean;
-}
-
-export const LinkIndex = (props: Props) => {
-  const onClickItem = useCallback(
-    (l: Link) => {
-      props.onSelectItem(l);
-    },
-    [props]
-  );
+export const LinkIndex = () => {
+  const { links } = useContext(DataContext);
 
   return (
     <Wrapper>
-      {props.items.map(link => (
-        <Column isPanel={props.isPanelView} key={link.id}>
-          {props.isPanelView ? (
-            <LinkItemPanel
-              item={link}
-              onClick={onClickItem}
-              onClickTag={props.onClickTag}
-            />
-          ) : (
-            <LinkItem
-              item={link}
-              onClick={onClickItem}
-              onClickTag={props.onClickTag}
-            />
-          )}
+      {links.map(link => (
+        <Column key={link.id}>
+          <LinkItem item={link} />
         </Column>
       ))}
     </Wrapper>
@@ -48,16 +23,8 @@ const Wrapper = styled.div`
   padding: 16px;
 `;
 
-const Column = styled.div<{ isPanel: boolean }>`
+const Column = styled.div`
   display: flex;
-  ${props =>
-    props.isPanel
-      ? css`
-          flex: 0 1 20%;
-          max-width: 20%;
-        `
-      : css`
-          flex: 0 1 100%;
-        `}
+  flex: 0 1 100%;
   box-sizing: border-box;
 `;
