@@ -16,12 +16,15 @@ import (
 func Run() error {
 	db, err := infrastructure.NewDBConn()
 	if err != nil {
-		return err
+		panic(err)
 	}
-	defer db.Close()
-	if err != nil {
-		return err
-	}
+
+	defer func() {
+		if err := db.Close(); err != nil {
+			panic(err)
+		}
+	}()
+
 	httpClient := http.DefaultClient
 	esClient, err := infrastructure.NewESClient()
 	if err != nil {
