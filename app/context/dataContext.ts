@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, Dispatch, SetStateAction } from "react";
 import { Link, Tag } from "../model/link";
 
@@ -11,10 +13,10 @@ type DataContextProps = {
 
 const defaultProps = {
   links: [],
-  setLinks: () => {},
+  setLinks: () => { },
 
   tags: [],
-  setTags: () => {}
+  setTags: () => { }
 };
 
 export const DataContext = createContext<DataContextProps>(defaultProps);
