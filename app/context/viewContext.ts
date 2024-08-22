@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, Dispatch, SetStateAction } from "react";
 import { ThemeType, themeNames } from "../theme";
 
@@ -13,13 +15,13 @@ type ViewContextProps = {
 
 const defaultProps = {
   themeName: themeNames[0],
-  setThemeName: () => {},
+  setThemeName: () => { },
 
   slideOpen: false,
-  setSlideOpen: () => {},
+  setSlideOpen: () => { },
 
   slideTargetLinkId: 0,
-  setSlideTargetLinkId: () => {}
+  setSlideTargetLinkId: () => { }
 };
 
 export const ViewContext = createContext<ViewContextProps>(defaultProps);

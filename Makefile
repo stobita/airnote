@@ -16,5 +16,5 @@ sqlboiler:
 	docker-compose -f $(DEV_COMPOSE) exec api sqlboiler mysql --wipe -o ./internal/repository/rdb -c ./db/sqlboiler.toml -p rdb --no-auto-timestamps --no-tests
 
 test-go:
-		docker-compose -f $(TEST_COMPOSE) up --abort-on-container-exit && \
-		docker-compose -f $(TEST_COMPOSE) down --volumes
+	docker-compose -f $(TEST_COMPOSE) up --abort-on-container-exit && \
+	docker-compose -f $(TEST_COMPOSE) down --volumes
