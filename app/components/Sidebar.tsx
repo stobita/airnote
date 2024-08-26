@@ -1,8 +1,6 @@
-'use client'
-
 import React, { useState, useContext } from "react";
 import styled from "styled-components";
-import * as settingSvg from "../assets/setting.svg";
+import SettingIconImage from "../assets/setting.svg";
 import { Switch } from "./Switch";
 import { ViewContext } from "../context/viewContext";
 import { TagList } from "./TagList";
@@ -69,7 +67,7 @@ const Bottom = styled.div`
   margin-top: auto;
 `;
 
-const SettingIcon = styled(settingSvg.RaactComponent)`
+const SettingIcon = styled(SettingIconImage)`
   fill: ${props => props.theme.solid};
   cursor: pointer;
   height: 36px;

@@ -4,7 +4,7 @@ import styled from "styled-components";
 import { LinkItemDetail } from "./LinkItemDetail";
 import { LinkItemTags } from "./LinkItemTags";
 import { ViewContext } from "../context/viewContext";
-import { ReactComponent as EditIconImage } from "../assets/edit.svg";
+import EditIconImage from "../assets/edit.svg";
 
 interface Props {
   item: Link;
