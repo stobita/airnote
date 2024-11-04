@@ -12,12 +12,8 @@ import { DeleteConfirmation } from "./DeleteConfirmation";
 
 export const LinkForm = () => {
   const { links, tags, setLinks } = useContext(DataContext);
-  const {
-    slideTargetLinkId,
-    setSlideTargetLinkId,
-    slideOpen,
-    setSlideOpen
-  } = useContext(ViewContext);
+  const { slideTargetLinkId, setSlideTargetLinkId, slideOpen, setSlideOpen } =
+    useContext(ViewContext);
 
   useEffect(() => {
     if (slideOpen === false) {
@@ -25,12 +21,12 @@ export const LinkForm = () => {
     }
   }, [slideOpen]);
 
-  const target = links.find(v => v.id === slideTargetLinkId);
+  const target = links.find((v) => v.id === slideTargetLinkId);
   const isEdit = target;
   const initFormValue: LinkPayload = {
     url: target ? target.url : "",
     description: target ? target.description : "",
-    tags: target ? target.tags.map(v => v.text) : []
+    tags: target ? target.tags.map((v) => v.text) : [],
   };
 
   const [isDelete, setIsDelete] = useState(false);
@@ -38,16 +34,16 @@ export const LinkForm = () => {
     initFormValue || {
       url: "",
       description: "",
-      tags: []
-    }
+      tags: [],
+    },
   );
 
   const handleAfterSubmit = async (id: number) => {
     const links = await linksRepository.getAllLinks();
     setLinks(links);
     const original = await linksRepository.getLinkOriginal(id);
-    const newlinks = links.map(i =>
-      i.id === id ? { ...i, title: original.title } : i
+    const newlinks = links.map((i) =>
+      i.id === id ? { ...i, title: original.title } : i,
     );
     setLinks(newlinks);
   };
@@ -55,14 +51,14 @@ export const LinkForm = () => {
   const [formError, setFormError] = useState("");
 
   const onChangeValue = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     e.persist();
-    setFormValue(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormValue((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const onChangeTag = useCallback((items: string[]) => {
-    setFormValue(prev => ({ ...prev, tags: items }));
+    setFormValue((prev) => ({ ...prev, tags: items }));
   }, []);
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -73,7 +69,7 @@ export const LinkForm = () => {
     const action = isEdit
       ? linksRepository.updateLink(slideTargetLinkId, formValue)
       : linksRepository.createLink(formValue);
-    const res = await action.catch(err => {
+    const res = await action.catch((err) => {
       setFormError("unexpected error");
       return Promise.reject(err);
     });
@@ -82,7 +78,7 @@ export const LinkForm = () => {
     setFormValue({
       url: "",
       description: "",
-      tags: []
+      tags: [],
     });
   };
 
@@ -163,12 +159,12 @@ export const LinkForm = () => {
 };
 
 const Field = styled.div`
-  color: ${props => props.theme.solid};
+  color: ${(props) => props.theme.solid};
   display: flex;
   margin-bottom: 8px;
 `;
 
 const ErrorMessage = styled.div`
   padding: 16px 0;
-  color: ${props => props.theme.danger};
+  color: ${(props) => props.theme.danger};
 `;
